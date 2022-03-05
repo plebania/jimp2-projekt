@@ -1,0 +1,56 @@
+Nazwa
+
+Graph
+
+Streszczenie
+
+graph make [file] --width val[int] --height val[int] --weight_min val[double] --weight_max val[double]
+graph load [file] -c --from_x val[int] --from_y val[int] --to_x val[int] --to_y val[int]
+
+
+
+
+
+Opis
+
+Cel projektu
+Program na celu utworzenie grafu (wczytaniu grafu z podanego pliku) o podanych wartościach (liczba kolumn, i wierszy węzłów oraz wagach dla krawędzi wyznaczanych w sposób losowy). Potrafi również sprawdzić czy podany graf jest koherenty (za pomocą algorytmu BFS) oraz wyznaczenie na stworzonym grafie najkrótszej scieżki pomiędzy wybranymi parami węzłów, przy pomocy algorytmu Dijkstry.
+
+
+graph make [Plik] [Argumenty]...
+    polecenie tworzące graf o zadanych parametrach, zapisujące go do pliku [plik]
+
+Plik:
+    ścieżka pod którą wygenerowany graf zostanie zapisany (argument obowiązkowy)
+
+Argumenty:
+    -w, --width val[int]
+        określa szerokość generowanego grafu, jęsli nie podano domyślną wartością jest 10
+    -h, --height val[int]
+        określa wysokość generowanego grafu, jęsli nie podano domyślną wartością jest 10
+    -w_min, --weight_min val[double]
+        określa minimalną wartość wag grafu, jęsli nie podano domyślną wartością jest 0
+    -w_max, --weight_max val[double]
+        określa maksymalną wartość wag grafu, jęsli nie podano domyślną wartością jest 1
+
+graph load [Plik] [Opcje]... [Argumenty]...
+    polecenie wykonujące określone w opcjach zadania na grafie wczytanym z pliku [plik]
+
+Plik:
+    ścieżka z której graf zostanie wczytany (argument obowiązkowy)
+
+Opcje:
+    -c, --coherent 
+        zwraca prawdę jeśli wczytany graf jest spójny, lub fałsz jeśli jest niespójny
+
+Argumenty:
+    -f_x, --from_x val[int] określa współrzędną x-ową punktu od którego szukana jest ścieżka
+    -f_y, --from_y val[int] określa współrzędną y-ową punktu od którego szukana jest ścieżka
+    -t_x, --to_x val[int] określa współrzędną x-ową punktu do którego szukana jest ścieżka
+    -t_y, --to_y val[int] określa współrzędną x-ową punktu od którego szukana jest ścieżka
+        jeśli powyższe 4 argumenty nie są określone ścieżka nie będzie szukana, współrzędne x są liczone od 0 do width-1, współrzędne y są liczone od 0 do height-1 
+
+Autorzy
+
+Marcin Ścisłowski
+Mikołaj Guzik
