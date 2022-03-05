@@ -11,9 +11,8 @@ graph load [file] -c --from_x val[int] --from_y val[int] --to_x val[int] --to_y 
 
 
 
-Opis
+Opis:
 
-Cel projektu
 Program na celu utworzenie grafu (wczytaniu grafu z podanego pliku) o podanych wartościach (liczba kolumn, i wierszy węzłów oraz wagach dla krawędzi wyznaczanych w sposób losowy). Potrafi również sprawdzić czy podany graf jest koherenty (za pomocą algorytmu BFS) oraz wyznaczenie na stworzonym grafie najkrótszej scieżki pomiędzy wybranymi parami węzłów, przy pomocy algorytmu Dijkstry.
 
 
@@ -50,7 +49,11 @@ Argumenty:
     -t_y, --to_y val[int] określa współrzędną x-ową punktu od którego szukana jest ścieżka
         jeśli powyższe 4 argumenty nie są określone ścieżka nie będzie szukana, współrzędne x są liczone od 0 do width-1, współrzędne y są liczone od 0 do height-1 
 
-Autorzy
+Repozytorium:
+
+https://github.com/plebania/jimp2-projekt
+
+Autorzy:
 
 Marcin Ścisłowski
 Mikołaj Guzik
