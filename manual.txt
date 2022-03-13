@@ -58,6 +58,72 @@ Parametry:
         odpowiednio horyzontalna i wertykalna współrzędna pozycji wierzchołka grafu do którego szukana będzie najkrótsza ścieżka, liczby naturalne, współrzędne liczone od 0
         
 
+Komunikaty błędów:
+
+    1. Brak poprawnie wczytanych parametrów wejściowych (z pliku). Przerywa działanie. Komunikat pojawia się gdy w podanych danych wejściowych brak poprawnie zdefiniowanych współrzędnych wierzchołków
+    2. Brak podania danych wejściowych. Komunikat pojawia się gdy do programu nie zostanie wprowadzona dana wejściowa. Program będzie wymagał określenia danych (jedynie w przypadku określenia wagi wierzchołków program przyjmuje wartości domyślne <0,1>
+    3. Brak komendy. Przerywa działanie. Komunikat pojawia się gdy użytkownik nie poda komendy jaką program ma wykonać ({make | check | path})   
+
+
+Dokumentacja implementacyjna
+
+
+Moduły
+
+-makefile
+-wczytanie argumentów wywołania
+-przechowywanie grafu
+-czytanie i zapis grafu
+-sprawdzanie spójności grafu
+-szukanie najkrótszej ścieżki w grafie
+
+
+Stróktury:
+    
+    struct tablica_dynamiczna_w{
+    wierzcholek *tab;
+    int size, cells;
+    }
+
+    struct tablica_dynamiczna_ks{
+    krawedz_skierowana *tab;
+    int size, cells;
+    };
+
+    struct krawedz_skierowana{
+    double waga;
+    wierzcholek *do;
+    };
+
+    struct wierzcholek{
+    tablica_dynamiczna_ks krawedzie;
+    };   
+
+
+    struct graf{
+    tablica_dynamiczna_w wierzcholki;
+    };
+
+Funkcje:
+
+    uint8_t spojny(struct graf *sprawdzany);
+    void najkrotsza_droga(struct graf *sprawdzany);
+    graf * stworz_graf(int w, int h);
+    graf * wczytaj_graf();
+    void zapisz_graf(char sciezka[], int rozmiar_sciezki, FILE *out);
+    int main(int argc char *argv[]);
+    
+
+
+
+
+
+
+
+
+
+
+
 Repozytorium:
 
 https://github.com/plebania/jimp2-projekt
