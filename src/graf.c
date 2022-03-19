@@ -56,7 +56,7 @@ struct krawedz *init_k(struct wierzcholek *w, double waga)
     return k;
 }
 
-struct tablica_dynamiczna_k *dodaj_k(struct tablica_dynamiczna_w *tab_k, struct krawedz *k)
+struct tablica_dynamiczna_k *dodaj_k(struct tablica_dynamiczna_k *tab_k, struct krawedz *k)
 {
     if (tab_k->cells >= tab_k->size)
     {
