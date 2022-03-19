@@ -96,6 +96,7 @@ Stróktury:
     };
 
     struct wierzcholek{
+    int nr;
     tablica_dynamiczna_ks krawedzie;
     };   
 
