@@ -5,15 +5,16 @@
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    struct tablica_dynamiczna_w *tab_w;
-    struct tablica_dynamiczna_k *tab_k;
-    tab_w = init_tab_w();
-    for (int x = 0; x < 170; x++)
-        tab_w = dodaj_w(tab_w, init_w());
+    struct graf *g = stworz_graf(10, 10);
+    for (int x = 0; x < g->wierzcholki->cells; x++)
+    {
+        printf(" ");
+        for (int y = 0; y < g->wierzcholki->tab[x]->krawedzie->cells; y++)
+            printf("[%d-%lf->%d]\n", g->wierzcholki->tab[x]->nr, g->wierzcholki->tab[x]->krawedzie->tab[y]->waga, g->wierzcholki->tab[x]->krawedzie->tab[y]->_do->nr);
+        printf(" \n");
+    }
 
-    tab_k = init_tab_k();
-    for (int x = 0; x < 100; x++)
-        tab_k = dodaj_k(tab_k, init_k(tab_w->tab[x], rand()));
-    wypisz_tab_k(tab_k);
+    // printf("[%d-%lf->%d]\n", g->wierzcholki->tab[x]->nr, g->wierzcholki->tab[x]->krawedzie->tab[y]->waga, g->wierzcholki->tab[x]->krawedzie->tab[y]->_do->nr);
+
     return 0;
 }
