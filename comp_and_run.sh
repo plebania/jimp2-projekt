@@ -1,3 +1,3 @@
 #!/bin/bash
 make -B
-./bin/graph
+./bin/graph test

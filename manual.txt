@@ -78,37 +78,37 @@ Moduły
 Struktury:
     
     struct tablica_dynamiczna_w{
-        wierzcholek *tab;
+        wierzcholek **tab;
         int size, cells;
     };
 
-    struct tablica_dynamiczna_ks{
-        krawedz_skierowana *tab;
+    struct tablica_dynamiczna_k{
+        krawedz **tab;
         int size, cells;
     };
 
-    struct krawedz_skierowana{
+    struct krawedz {
         double waga;
-        wierzcholek *do;
+        wierzcholek *_do;
     };
 
     struct wierzcholek{
-    int nr;
-    tablica_dynamiczna_ks krawedzie;
+        int nr;
+        tablica_dynamiczna_k krawedzie;
     };   
 
 
     struct graf{
-        tablica_dynamiczna_w wierzcholki;
+        tablica_dynamiczna_w *wierzcholki;
     };
 
 Funkcje:
 
-    uint8_t spojny(struct graf *sprawdzany);
-    void najkrotsza_droga(struct graf *sprawdzany);
+    int spojny(struct graf *sprawdzany);
+    void dijkstra(struct graf *sprawdzany);
     graf * stworz_graf(int w, int h);
     graf * wczytaj_graf();
-    void zapisz_graf(char sciezka[], int rozmiar_sciezki, FILE *out);
+    void zapisz_graf(FILE *out, struct graf *g);
     int main(int argc char *argv[]);
     
 Testy:
