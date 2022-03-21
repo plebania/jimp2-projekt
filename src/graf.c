@@ -12,6 +12,13 @@ struct wierzcholek *init_w()
     return w;
 }
 
+// Jakis blad...
+void free_wierzcholek(struct wierzcholek *w)
+{
+    // free_tablica_dynamiczna_k(w->krawedzie);
+    // free(w->krawedzie);
+}
+
 struct wierzcholek *w_dodaj_k(struct wierzcholek *od, struct wierzcholek *_do, double waga)
 {
     od->krawedzie = dodaj_k(od->krawedzie, init_k(_do, waga));
@@ -66,6 +73,13 @@ void wypisz_tab_w(struct tablica_dynamiczna_w *tab_w)
     printf("%d]", tab_w->tab[tab_w->cells - 1]->nr);
 }
 
+void free_tablica_dynamicza_w(struct tablica_dynamiczna_w *tab_w)
+{
+    for (int x = 0; x < tab_w->cells; x++)
+        free_wierzcholek(tab_w->tab[x]);
+    free(tab_w->tab);
+}
+
 struct krawedz *init_k(struct wierzcholek *w, double waga)
 {
     struct krawedz *k = malloc(sizeof(struct krawedz *));
@@ -105,19 +119,26 @@ void wypisz_tab_k(struct tablica_dynamiczna_k *tab_k)
         printf("(%lf, %d),", tab_k->tab[x]->waga, tab_k->tab[x]->_do->nr);
     printf("(%lf, %d)]", tab_k->tab[tab_k->cells - 1]->waga, tab_k->tab[tab_k->cells - 1]->_do->nr);
 }
+void free_tablica_dynamiczna_k(struct tablica_dynamiczna_k *tab_k)
+{
+    for (int x = 0; x < tab_k->cells; x++)
+        free(tab_k->tab[x]);
+    free(tab_k);
+}
 
-// TODO 1x1
 struct graf *stworz_graf(int w, int h)
 {
+
     struct graf *g = NULL;
     if (w < 1 || h < 1)
         return g;
     g = malloc(sizeof(struct graf *));
     g->wierzcholki = init_tab_w(w * h);
     g->wierzcholki = dodaj_n_w(g->wierzcholki, w * h);
+
     if (w == 1 || h == 1)
     {
-        for (int x = 1; x < w * h - 2; x++)
+        for (int x = 1; x < w * h - 1; x++)
         {
             g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x - 1], rand()));
             g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x + 1], rand()));
@@ -167,4 +188,10 @@ struct graf *stworz_graf(int w, int h)
         g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie, init_k(g->wierzcholki->tab[y * w - 1], rand()));
     }
     return g;
+}
+
+void free_graf(struct graf *g)
+{
+    free_tablica_dynamicza_w(g->wierzcholki);
+    free(g->wierzcholki);
 }

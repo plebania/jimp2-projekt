@@ -18,6 +18,6 @@ int main(int argc, char *argv[])
     }
 
     // printf("[%d-%lf->%d]\n", g->wierzcholki->tab[x]->nr, g->wierzcholki->tab[x]->krawedzie->tab[y]->waga, g->wierzcholki->tab[x]->krawedzie->tab[y]->_do->nr);
-
+    free_graf(g);
     return 0;
 }
