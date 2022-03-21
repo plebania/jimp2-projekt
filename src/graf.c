@@ -106,24 +106,65 @@ void wypisz_tab_k(struct tablica_dynamiczna_k *tab_k)
     printf("(%lf, %d)]", tab_k->tab[tab_k->cells - 1]->waga, tab_k->tab[tab_k->cells - 1]->_do->nr);
 }
 
+// TODO 1x1
 struct graf *stworz_graf(int w, int h)
 {
-    struct graf *g = malloc(sizeof(struct graf *));
+    struct graf *g = NULL;
+    if (w < 1 || h < 1)
+        return g;
+    g = malloc(sizeof(struct graf *));
     g->wierzcholki = init_tab_w(w * h);
     g->wierzcholki = dodaj_n_w(g->wierzcholki, w * h);
-    // struct krawedz *pom = init_k(init_w(), 0.1);
-    // printf("%d %d", g->wierzcholki->cells, g->wierzcholki->size);
-    // for (int x = 0; x < w * h; x++)
-    //     printf("%d\n", g->wierzcholki->tab[0]->nr);
-    for (int y = 1; y < w - 1; y++)
+    if (w == 1 || h == 1)
     {
-        for (int x = 1; x < h - 1; x++)
+        for (int x = 1; x < w * h - 2; x++)
+        {
+            g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x - 1], rand()));
+            g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x + 1], rand()));
+        }
+        g->wierzcholki->tab[0]->krawedzie = dodaj_k(g->wierzcholki->tab[0]->krawedzie, init_k(g->wierzcholki->tab[1], rand()));
+        g->wierzcholki->tab[w * h - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[0]->krawedzie, init_k(g->wierzcholki->tab[w * h - 2], rand()));
+        return g;
+    }
+
+    g->wierzcholki->tab[0]->krawedzie = dodaj_k(g->wierzcholki->tab[0]->krawedzie, init_k(g->wierzcholki->tab[1], rand()));
+    g->wierzcholki->tab[0]->krawedzie = dodaj_k(g->wierzcholki->tab[0]->krawedzie, init_k(g->wierzcholki->tab[w], rand()));
+
+    g->wierzcholki->tab[w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[w - 1]->krawedzie, init_k(g->wierzcholki->tab[w - 2], rand()));
+    g->wierzcholki->tab[w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[w - 1]->krawedzie, init_k(g->wierzcholki->tab[2 * w - 1], rand()));
+
+    g->wierzcholki->tab[(h - 1) * w]->krawedzie = dodaj_k(g->wierzcholki->tab[(h - 1) * w]->krawedzie, init_k(g->wierzcholki->tab[(h - 1) * w + 1], rand()));
+    g->wierzcholki->tab[(h - 1) * w]->krawedzie = dodaj_k(g->wierzcholki->tab[(h - 1) * w]->krawedzie, init_k(g->wierzcholki->tab[(h - 2) * w], rand()));
+
+    g->wierzcholki->tab[h * w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[h * w - 1]->krawedzie, init_k(g->wierzcholki->tab[h * w - 2], rand()));
+    g->wierzcholki->tab[h * w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[h * w - 1]->krawedzie, init_k(g->wierzcholki->tab[(h - 1) * w - 1], rand()));
+    for (int x = 1; x < w - 1; x++)
+    {
+        g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x + 1], rand()));
+        g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x - 1], rand()));
+        g->wierzcholki->tab[x]->krawedzie = dodaj_k(g->wierzcholki->tab[x]->krawedzie, init_k(g->wierzcholki->tab[x + w], rand()));
+
+        g->wierzcholki->tab[x + (h - 1) * w]->krawedzie = dodaj_k(g->wierzcholki->tab[x + (h - 1) * w]->krawedzie, init_k(g->wierzcholki->tab[x + (h - 1) * w - 1], rand()));
+        g->wierzcholki->tab[x + (h - 1) * w]->krawedzie = dodaj_k(g->wierzcholki->tab[x + (h - 1) * w]->krawedzie, init_k(g->wierzcholki->tab[x + (h - 1) * w + 1], rand()));
+        g->wierzcholki->tab[x + (h - 1) * w]->krawedzie = dodaj_k(g->wierzcholki->tab[x + (h - 1) * w]->krawedzie, init_k(g->wierzcholki->tab[x + (h - 2) * w], rand()));
+
+        for (int y = 1; y < h - 1; y++)
         {
             g->wierzcholki->tab[y * w + x]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w + x]->krawedzie, init_k(g->wierzcholki->tab[y * w + x + 1], rand()));
             g->wierzcholki->tab[y * w + x]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w + x]->krawedzie, init_k(g->wierzcholki->tab[y * w + x - 1], rand()));
             g->wierzcholki->tab[y * w + x]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w + x]->krawedzie, init_k(g->wierzcholki->tab[y * w + x + w], rand()));
             g->wierzcholki->tab[y * w + x]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w + x]->krawedzie, init_k(g->wierzcholki->tab[y * w + x - w], rand()));
         }
+    }
+    for (int y = 1; y < h - 1; y++)
+    {
+        g->wierzcholki->tab[y * w]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w]->krawedzie, init_k(g->wierzcholki->tab[y * w + 1], rand()));
+        g->wierzcholki->tab[y * w]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w]->krawedzie, init_k(g->wierzcholki->tab[(y + 1) * w], rand()));
+        g->wierzcholki->tab[y * w]->krawedzie = dodaj_k(g->wierzcholki->tab[y * w]->krawedzie, init_k(g->wierzcholki->tab[(y - 1) * w], rand()));
+
+        g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie, init_k(g->wierzcholki->tab[(y + 1) * w - 2], rand()));
+        g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie, init_k(g->wierzcholki->tab[(y + 2) * w - 1], rand()));
+        g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie = dodaj_k(g->wierzcholki->tab[(y + 1) * w - 1]->krawedzie, init_k(g->wierzcholki->tab[y * w - 1], rand()));
     }
     return g;
 }

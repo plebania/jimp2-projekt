@@ -21,13 +21,13 @@ struct wierzcholek
 struct tablica_dynamiczna_w
 {
     struct wierzcholek **tab;
-    int size, cells;
+    int size, cells; // size - ilosc przydzielonych komorek pamieci, cells - ilosc urzywanych kommorek
 };
 
 struct tablica_dynamiczna_k
 {
     struct krawedz **tab;
-    int size, cells;
+    int size, cells; // size - ilosc przydzielonych komorek pamieci, cells - ilosc urzywanych kommorek
 };
 
 struct wierzcholek *init_w();

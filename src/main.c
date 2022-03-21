@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    struct graf *g = stworz_graf(10, 10);
+    struct graf *g = stworz_graf(1, 10);
     for (int x = 0; x < g->wierzcholki->cells; x++)
     {
         printf(" ");
