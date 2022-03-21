@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <time.h>
 #include "graf.h"
+#include "zapisz.h"
 int main(int argc, char *argv[])
 {
+    FILE *out = fopen(argv[1], "w");
+
     srand(time(NULL));
     struct graf *g = stworz_graf(1, 10);
     for (int x = 0; x < g->wierzcholki->cells; x++)
