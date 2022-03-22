@@ -11,7 +11,10 @@ int main(int argc, char *argv[])
     struct graf *g = stworz_graf(1, 10);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     zapisz_graf(out, g);
 
     //for (int x = 0; x < g->wierzcholki->cells; x++)
@@ -22,6 +25,9 @@ int main(int argc, char *argv[])
     //    printf(" \n");
     //}
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     // printf("[%d-%lf->%d]\n", g->wierzcholki->tab[x]->nr, g->wierzcholki->tab[x]->krawedzie->tab[y]->waga, g->wierzcholki->tab[x]->krawedzie->tab[y]->_do->nr);
     free_graf(g);
