@@ -3,6 +3,11 @@
 #define INFTY 999999
 #include "stdio.h"
 
+struct stos
+{
+    int *tab, cells, size;
+};
+
 struct stos *dodaj_w(struct stos *s, int w)
 {
     if (s->cells >= s->size)
@@ -42,20 +47,20 @@ void free_stos(struct stos *s)
     free(s->tab);
 }
 
-void bfs(struct graf *g, int od)
+struct bfs_out *bfs(struct graf *g, int od)
 {
     struct stos *s = init_stos(g->cells);
-    int *poprzednik, *odleglosc, *zwiedzone;
-    poprzednik = malloc(sizeof(int) * (g->cells));
-    odleglosc = malloc(sizeof(int) * (g->cells));
-    zwiedzone = malloc(sizeof(int) * (g->cells));
+    struct bfs_out *out = malloc(sizeof(struct bfs_out));
+    out->poprzednik = malloc(sizeof(int) * (g->cells));
+    out->odleglosc = malloc(sizeof(int) * (g->cells));
+    out->zwiedzone = malloc(sizeof(int) * (g->cells));
     for (int x = 0; x < g->cells; x++)
     {
-        odleglosc[x] = INFTY;
-        poprzednik[x] = 0;
-        zwiedzone[x] = 0;
+        out->odleglosc[x] = INFTY;
+        out->poprzednik[x] = 0;
+        out->zwiedzone[x] = 0;
     }
-    odleglosc[od] = 0;
+    out->odleglosc[od] = 0;
     s = dodaj_w(s, od);
     int w, v;
     while (s->cells)
@@ -64,21 +69,19 @@ void bfs(struct graf *g, int od)
         for (int y = 0; y < g->tab[w]->cells; y++)
         {
             v = g->tab[w]->tab[y]->_do;
-            if (zwiedzone[v] == 0)
+            if (out->zwiedzone[v] == 0)
             {
-                zwiedzone[v] = 1;
-                odleglosc[v] = odleglosc[w] + 1;
-                poprzednik[v] = w;
+                out->zwiedzone[v] = 1;
+                out->odleglosc[v] = out->odleglosc[w] + 1;
+                out->poprzednik[v] = w;
                 s = dodaj_w(s, v);
             }
         }
-        zwiedzone[w] = 2;
+        out->zwiedzone[w] = 2;
     }
     // for (int x = 0; x < g->cells; x++)
     //     printf("wierzcholek: %d, odleglosc %d, poprzednik %d\n", x, odleglosc[x], poprzednik[x]);
-    free(poprzednik);
-    free(odleglosc);
-    free(zwiedzone);
     free_stos(s);
     free(s);
+    return out;
 }

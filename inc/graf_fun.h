@@ -2,10 +2,11 @@
 #define GRAF_FUN_H
 
 #include "graf.h"
-struct stos
+
+struct bfs_out
 {
-    int *tab, cells, size;
+    int *poprzednik, *odleglosc, *zwiedzone;
 };
 
-void bfs(struct graf *g, int od);
+struct bfs_out *bfs(struct graf *g, int od);
 #endif
