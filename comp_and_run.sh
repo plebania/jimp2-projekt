@@ -1,3 +1,3 @@
 #!/bin/bash
 make -B
-./bin/graph test 4 10
+./bin/graph make test 1 10
