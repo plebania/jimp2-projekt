@@ -14,7 +14,7 @@ InCFLAGS= -I$(IDIR) -Wall -Wextra -pedantic
 OBJECTS  := $(SOURCES:$(SDIR)/%.c=$(ODIR)/%.o)
 
 $(BDIR)/$(TARGET): $(OBJECTS)
-	gcc -o $@ $(LFLAGS) $(OBJECTS)
+	$(CC) -o $@ $(LFLAGS) $(OBJECTS)
 
 $(OBJECTS): $(ODIR)/%.o : $(SDIR)/%.c
 	$(CC) $(CFLAGS) $(InCFLAGS) -c $< -o $@
