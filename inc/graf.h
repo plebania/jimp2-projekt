@@ -27,7 +27,7 @@ void wypisz_td_krawedz(struct td_krawedz *tab_k);
 void free_td_krawedz(struct td_krawedz *tab_k);
 
 struct graf *init_graf(unsigned int wierzcholkow);
-struct graf *stworz_graf(int w, int h);
+struct graf *stworz_graf(int w, int h, double min_wag, double max_wag, unsigned int psuc);
 void free_graf(struct graf *g);
 
 #endif

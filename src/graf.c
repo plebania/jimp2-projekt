@@ -65,9 +65,9 @@ struct graf *init_graf(unsigned int wierzcholkow)
     return g;
 }
 
-struct graf *stworz_graf(int w, int h)
+struct graf *stworz_graf(int w, int h, double min_wag, double max_wag, unsigned int psuc)
 {
-
+#define RAND_WAG min_wag + (double)rand() / ((double)RAND_MAX + 1) * (max_wag - min_wag)
     struct graf *g = NULL;
     if (w < 1 || h < 1)
         return g;
@@ -79,52 +79,52 @@ struct graf *stworz_graf(int w, int h)
     {
         for (int x = 1; x < w * h - 1; x++)
         {
-            g->tab[x] = dodaj_k(g->tab[x], init_k(x - 1, rand()));
-            g->tab[x] = dodaj_k(g->tab[x], init_k(x + 1, rand()));
+            g->tab[x] = dodaj_k(g->tab[x], init_k(x - 1, RAND_WAG));
+            g->tab[x] = dodaj_k(g->tab[x], init_k(x + 1, RAND_WAG));
         }
-        g->tab[0] = dodaj_k(g->tab[0], init_k(1, rand()));
-        g->tab[w * h - 1] = dodaj_k(g->tab[0], init_k(w * h - 2, rand()));
+        g->tab[0] = dodaj_k(g->tab[0], init_k(1, RAND_WAG));
+        g->tab[w * h - 1] = dodaj_k(g->tab[0], init_k(w * h - 2, RAND_WAG));
         return g;
     }
 
-    g->tab[0] = dodaj_k(g->tab[0], init_k(1, rand()));
-    g->tab[0] = dodaj_k(g->tab[0], init_k(w, rand()));
+    g->tab[0] = dodaj_k(g->tab[0], init_k(1, RAND_WAG));
+    g->tab[0] = dodaj_k(g->tab[0], init_k(w, RAND_WAG));
 
-    g->tab[w - 1] = dodaj_k(g->tab[w - 1], init_k(w - 2, rand()));
-    g->tab[w - 1] = dodaj_k(g->tab[w - 1], init_k(2 * w - 1, rand()));
+    g->tab[w - 1] = dodaj_k(g->tab[w - 1], init_k(w - 2, RAND_WAG));
+    g->tab[w - 1] = dodaj_k(g->tab[w - 1], init_k(2 * w - 1, RAND_WAG));
 
-    g->tab[(h - 1) * w] = dodaj_k(g->tab[(h - 1) * w], init_k((h - 1) * w + 1, rand()));
-    g->tab[(h - 1) * w] = dodaj_k(g->tab[(h - 1) * w], init_k((h - 2) * w, rand()));
+    g->tab[(h - 1) * w] = dodaj_k(g->tab[(h - 1) * w], init_k((h - 1) * w + 1, RAND_WAG));
+    g->tab[(h - 1) * w] = dodaj_k(g->tab[(h - 1) * w], init_k((h - 2) * w, RAND_WAG));
 
-    g->tab[h * w - 1] = dodaj_k(g->tab[h * w - 1], init_k(h * w - 2, rand()));
-    g->tab[h * w - 1] = dodaj_k(g->tab[h * w - 1], init_k((h - 1) * w - 1, rand()));
+    g->tab[h * w - 1] = dodaj_k(g->tab[h * w - 1], init_k(h * w - 2, RAND_WAG));
+    g->tab[h * w - 1] = dodaj_k(g->tab[h * w - 1], init_k((h - 1) * w - 1, RAND_WAG));
     for (int x = 1; x < w - 1; x++)
     {
-        g->tab[x] = dodaj_k(g->tab[x], init_k(x + 1, rand()));
-        g->tab[x] = dodaj_k(g->tab[x], init_k(x - 1, rand()));
-        g->tab[x] = dodaj_k(g->tab[x], init_k(x + w, rand()));
+        g->tab[x] = dodaj_k(g->tab[x], init_k(x + 1, RAND_WAG));
+        g->tab[x] = dodaj_k(g->tab[x], init_k(x - 1, RAND_WAG));
+        g->tab[x] = dodaj_k(g->tab[x], init_k(x + w, RAND_WAG));
 
-        g->tab[x + (h - 1) * w] = dodaj_k(g->tab[x + (h - 1) * w], init_k(x + (h - 1) * w - 1, rand()));
-        g->tab[x + (h - 1) * w] = dodaj_k(g->tab[x + (h - 1) * w], init_k(x + (h - 1) * w + 1, rand()));
-        g->tab[x + (h - 1) * w] = dodaj_k(g->tab[x + (h - 1) * w], init_k(x + (h - 2) * w, rand()));
+        g->tab[x + (h - 1) * w] = dodaj_k(g->tab[x + (h - 1) * w], init_k(x + (h - 1) * w - 1, RAND_WAG));
+        g->tab[x + (h - 1) * w] = dodaj_k(g->tab[x + (h - 1) * w], init_k(x + (h - 1) * w + 1, RAND_WAG));
+        g->tab[x + (h - 1) * w] = dodaj_k(g->tab[x + (h - 1) * w], init_k(x + (h - 2) * w, RAND_WAG));
 
         for (int y = 1; y < h - 1; y++)
         {
-            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x + 1, rand()));
-            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x - 1, rand()));
-            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x + w, rand()));
-            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x - w, rand()));
+            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x + 1, RAND_WAG));
+            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x - 1, RAND_WAG));
+            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x + w, RAND_WAG));
+            g->tab[y * w + x] = dodaj_k(g->tab[y * w + x], init_k(y * w + x - w, RAND_WAG));
         }
     }
     for (int y = 1; y < h - 1; y++)
     {
-        g->tab[y * w] = dodaj_k(g->tab[y * w], init_k(y * w + 1, rand()));
-        g->tab[y * w] = dodaj_k(g->tab[y * w], init_k((y + 1) * w, rand()));
-        g->tab[y * w] = dodaj_k(g->tab[y * w], init_k((y - 1) * w, rand()));
+        g->tab[y * w] = dodaj_k(g->tab[y * w], init_k(y * w + 1, RAND_WAG));
+        g->tab[y * w] = dodaj_k(g->tab[y * w], init_k((y + 1) * w, RAND_WAG));
+        g->tab[y * w] = dodaj_k(g->tab[y * w], init_k((y - 1) * w, RAND_WAG));
 
-        g->tab[(y + 1) * w - 1] = dodaj_k(g->tab[(y + 1) * w - 1], init_k((y + 1) * w - 2, rand()));
-        g->tab[(y + 1) * w - 1] = dodaj_k(g->tab[(y + 1) * w - 1], init_k((y + 2) * w - 1, rand()));
-        g->tab[(y + 1) * w - 1] = dodaj_k(g->tab[(y + 1) * w - 1], init_k(y * w - 1, rand()));
+        g->tab[(y + 1) * w - 1] = dodaj_k(g->tab[(y + 1) * w - 1], init_k((y + 1) * w - 2, RAND_WAG));
+        g->tab[(y + 1) * w - 1] = dodaj_k(g->tab[(y + 1) * w - 1], init_k((y + 2) * w - 1, RAND_WAG));
+        g->tab[(y + 1) * w - 1] = dodaj_k(g->tab[(y + 1) * w - 1], init_k(y * w - 1, RAND_WAG));
     }
 
     return g;
@@ -135,6 +135,5 @@ void free_graf(struct graf *g)
     for (int x = 0; x < g->size; x++)
         if (g->tab[x] != NULL)
             free_td_krawedz(g->tab[x]);
-    // free_tablica_dynamicza_w(g->wierzcholki);
     free(g->tab);
 }

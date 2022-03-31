@@ -4,7 +4,7 @@ Graph
 
 Streszczenie
 
-graph make file_out {width val1 | val1} {height val2 | val2} --weight_min val --weight_max val
+graph make file_out {{width | w} | val1} {{height | h} val2  | val2} --weight_min val --weight_max val
 graph check file_in
 graph path file_in from_x val from_y val to_x val to_y val
 
@@ -22,10 +22,10 @@ Parametry:
     file_out
         ścieżka pod którą wygenerowany graf zostanie zapisany
 
-    {width val1 | val1}
+    {width val1 | w val2 | val1}
         szerokość generowanego grafu, liczba naturalna
 
-    {height val2 | val2}
+    {height val2 | h val2 |  val2}
         wysokość generowanego grafu, liczba naturalna
 
 Argumenty:

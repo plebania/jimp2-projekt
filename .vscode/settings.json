@@ -4,6 +4,7 @@
         "typeinfo": "c",
         "stdio.h": "c",
         "graf.h": "c",
-        "graf_fun.h": "c"
+        "graf_fun.h": "c",
+        "string.h": "c"
     }
 }
