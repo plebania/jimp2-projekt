@@ -33,7 +33,7 @@ void zachowanie_make(FILE *plik, int w, int h, double min_wag, double max_wag)
     printf("make %d  %d  %f  %f\n", w, h, min_wag, max_wag);
     struct graf *g = stworz_graf(w, h, min_wag, max_wag, 0);
     zapisz_graf(plik, g);
-    // free_graf(g);
+    free_graf(g);
 }
 
 void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
