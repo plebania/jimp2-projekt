@@ -67,95 +67,92 @@ int arg_parse(int argc, char *argv[])
             return 1;
         }
 
-        if (strcmp(argv[1], "make") == 0)
+        int poz_par = 0; // poz_par - o ile miejsc przesuniete sa parametry od polecenia
+        double min_wag = 0, max_wag = 1;
+        if (argc < 5)
         {
-            int poz_par = 0; // poz_par - o ile miejsc przesuniete sa parametry od polecenia
-            double min_wag = 0, max_wag = 1;
-            if (argc < 5)
+            printf("za mało argumentów wywołania\n");
+            return 1;
+        }
+        // Szukam argumentów
+        for (int x = 3; x < argc - 1; x++)
+        {
+            if (strcmp(argv[x], "--weight_min") == 0)
             {
-                printf("za mało argumentów wywołania\n");
-                return 1;
-            }
-            // Szukam argumentów
-            for (int x = 3; x < argc - 1; x++)
-            {
-                if (strcmp(argv[x], "--weight_min") == 0)
+                if (czy_double(argv[x + 1]))
                 {
-                    if (czy_double(argv[x + 1]))
-                    {
-                        poz_par += 2;
-                        min_wag = atof(argv[x + 1]);
-                        x++;
-                    }
-                    else
-                    {
-                        printf("Po argumencie --weight_min spodziewana jest wartość\n");
-                        return 1;
-                    }
-                }
-                else if (strcmp(argv[x], "--weight_max") == 0)
-                {
-                    if (czy_double(argv[x + 1]))
-                    {
-                        poz_par += 2;
-                        max_wag = atof(argv[x + 1]);
-                        x++;
-                    }
-                    else
-                    {
-                        printf("Po argumencie --weight_max spodziewana jest wartość\n");
-                        return 1;
-                    }
-                }
-                else
-                    break;
-            }
-            // polecenie postaci graph make plik [arg]... val val
-            if (czy_int(argv[3 + poz_par]))
-            {
-                if (czy_int(argv[4 + poz_par]))
-                {
-                    w = atoi(argv[3 + poz_par]);
-                    h = atoi(argv[4 + poz_par]);
+                    poz_par += 2;
+                    min_wag = atof(argv[x + 1]);
+                    x++;
                 }
                 else
                 {
-                    fprintf(stderr, "Nie podano parametru height\n");
+                    printf("Po argumencie --weight_min spodziewana jest wartość\n");
                     return 1;
                 }
             }
-            else if (czy_int(argv[4 + poz_par]) && czy_int(argv[6 + poz_par]))
+            else if (strcmp(argv[x], "--weight_max") == 0)
             {
-                // polecenie postaci graph make plik [arg]... {w | width} val {h | height} val
-                if (strcmp(argv[3 + poz_par], "width") == 0 || strcmp(argv[3 + poz_par], "w") == 0)
+                if (czy_double(argv[x + 1]))
                 {
-                    if ((strcmp(argv[5 + poz_par], "height") == 0 || strcmp(argv[5 + poz_par], "h") == 0))
-                    {
-                        w = atoi(argv[4 + poz_par]);
-                        h = atoi(argv[6 + poz_par]);
-                    }
+                    poz_par += 2;
+                    max_wag = atof(argv[x + 1]);
+                    x++;
                 }
-                // polecenie postaci graph make plik [arg]... {h | height} val {w | width} val
-                else if (strcmp(argv[5 + poz_par], "width") == 0 || strcmp(argv[5 + poz_par], "w") == 0)
+                else
                 {
-                    if ((strcmp(argv[3 + poz_par], "height") == 0 || strcmp(argv[3 + poz_par], "h") == 0))
-                    {
-                        w = atoi(argv[4 + poz_par]);
-                        h = atoi(argv[6 + poz_par]);
-                    }
+                    printf("Po argumencie --weight_max spodziewana jest wartość\n");
+                    return 1;
                 }
-                else if (argc != 7 + poz_par)
-                    printf("Bledne argumenty wywołania, instrukcja\n");
             }
-            zachowanie_make(out_or_in, w, h, min_wag, max_wag);
+            else
+                break;
         }
-        else if (strcmp(argv[1], "check") == 0)
+        // polecenie postaci graph make plik [arg]... val val
+        if (czy_int(argv[3 + poz_par]))
         {
-            out_or_in = fopen(argv[2], "r");
-            srand(time(NULL));
-            zachowanie_check(out_or_in);
-            // struct graf *g = stworz_graf(val1, val2); // jeszcze nie ma zaimplementowanej funkcji wczytaj
+            if (czy_int(argv[4 + poz_par]))
+            {
+                w = atoi(argv[3 + poz_par]);
+                h = atoi(argv[4 + poz_par]);
+            }
+            else
+            {
+                fprintf(stderr, "Nie podano parametru height\n");
+                return 1;
+            }
         }
+        else if (czy_int(argv[4 + poz_par]) && czy_int(argv[6 + poz_par]))
+        {
+            // polecenie postaci graph make plik [arg]... {w | width} val {h | height} val
+            if (strcmp(argv[3 + poz_par], "width") == 0 || strcmp(argv[3 + poz_par], "w") == 0)
+            {
+                if ((strcmp(argv[5 + poz_par], "height") == 0 || strcmp(argv[5 + poz_par], "h") == 0))
+                {
+                    w = atoi(argv[4 + poz_par]);
+                    h = atoi(argv[6 + poz_par]);
+                }
+            }
+            // polecenie postaci graph make plik [arg]... {h | height} val {w | width} val
+            else if (strcmp(argv[5 + poz_par], "width") == 0 || strcmp(argv[5 + poz_par], "w") == 0)
+            {
+                if ((strcmp(argv[3 + poz_par], "height") == 0 || strcmp(argv[3 + poz_par], "h") == 0))
+                {
+                    w = atoi(argv[4 + poz_par]);
+                    h = atoi(argv[6 + poz_par]);
+                }
+            }
+            else if (argc != 7 + poz_par)
+                printf("Bledne argumenty wywołania, instrukcja\n");
+        }
+        zachowanie_make(out_or_in, w, h, min_wag, max_wag);
+    }
+    else if (strcmp(argv[1], "check") == 0)
+    {
+        out_or_in = fopen(argv[2], "r");
+        srand(time(NULL));
+        zachowanie_check(out_or_in);
+        // struct graf *g = stworz_graf(val1, val2); // jeszcze nie ma zaimplementowanej funkcji wczytaj
     }
     else if (strcmp(argv[1], "path") == 0)
     {
