@@ -15,4 +15,9 @@ int main(int argc, char *argv[])
     // FILE * out = fopen(argv[2], "w");
     srand(time(NULL));
     return arg_parse(argc, argv);
+
+    // struct graf *g = wczytaj_graf(in);
+
+    // zapisz_graf(out, g);
+
 }
