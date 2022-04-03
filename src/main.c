@@ -7,10 +7,12 @@
 #include "zapisz.h"
 #include "graf_fun.h"
 #include "arg_pars.h"
+#include "wczytaj.h"
 
 int main(int argc, char *argv[])
 {
-
+    // FILE * in = fopen(argv[1], "r");
+    // FILE * out = fopen(argv[2], "w");
     srand(time(NULL));
     arg_parse(argc, argv);
     // struct graf *g = stworz_graf(3, 3, -1, 1, 1);
@@ -30,4 +32,10 @@ int main(int argc, char *argv[])
     // printf("%s %s %s\n", argv[0], argv[1], argv[2]);
     // int q = strcmp(argv[1], "make") == 0 ? 1 : 2;
     // printf("%d", q);
+
+    /*
+    struct graf *g = wczytaj_graf(in);
+
+    zapisz_graf(out, g);
+    */
 }

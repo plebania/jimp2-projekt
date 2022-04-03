@@ -63,6 +63,8 @@ struct graf *init_graf(unsigned int wierzcholkow)
         pom *= 2;
     g->size = pom;
     g->cells = 0;
+    g->w = 0;
+    g->h = 0;
     return g;
 }
 

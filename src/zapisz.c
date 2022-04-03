@@ -6,14 +6,15 @@
 
 void zapisz_graf(FILE *out, struct graf *g)
 {
-    //fprintf(out, "%d %d\n", );
+    fprintf(out, "%d %d\n", g->w, g->h);
     for (int x = 0; x < g->cells; x++)
     {
+        fprintf(out, "\t");
         for (int y = 0; y < g->tab[x]->cells; y++)
         {
-            fprintf(out, "\t");
             fprintf(out, " %d :%lf ", g->tab[x]->tab[y]->_do, g->tab[x]->tab[y]->waga);
         }
         fprintf(out, "\n");
     }
+    fclose(out);
 }

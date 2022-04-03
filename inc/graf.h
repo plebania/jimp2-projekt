@@ -17,6 +17,7 @@ struct graf
 {
     struct td_krawedz **tab;
     int size, cells;
+    int w, h;
 };
 
 struct krawedz *init_k(unsigned int _od, double waga);
