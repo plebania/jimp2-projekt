@@ -1,0 +1,9 @@
+*
+!.gitignore
+!makefile
+!comp_and_run.sh
+!manual.txt
+!bin
+!inc
+!obj
+!src

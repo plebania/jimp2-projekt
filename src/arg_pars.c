@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <string.h>
 #include "graf.h"
-#include "zapisz.h"
+#include "io.h"
 #include "graf_fun.h"
 #include "arg_pars.h"
 int czy_double(char *napis)
@@ -45,7 +45,17 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
 
 void zachowanie_check(FILE *plik)
 {
-    printf("check");
+
+    struct graf *g = wczytaj_graf(plik);
+    struct bfs_out *out;
+    out = bfs(g, 0);
+    for (int x = 0; x < g->cells; x++)
+        if (out->zwiedzone[x] != 2)
+        {
+            printf("0");
+            return;
+        }
+    printf("1");
 }
 
 int arg_parse(int argc, char *argv[])

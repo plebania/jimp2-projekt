@@ -5,6 +5,7 @@
         "stdio.h": "c",
         "graf.h": "c",
         "graf_fun.h": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "io.h": "c"
     }
 }
