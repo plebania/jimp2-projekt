@@ -40,7 +40,19 @@ void zachowanie_make(FILE *plik, int w, int h, double min_wag, double max_wag)
 
 void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
 {
-    printf("path %d %d %d %d", from_x, from_y, to_x, to_y);
+    struct graf *g=wczytaj_graf(plik);
+    int from=from_x+from_y*g->w, to=to_x+to_y*g->w;
+    struct dijkstra_out *out=dijkstra(g, from);
+    printf("Długosci: %lf\nDroga: %d", out->droga[to], to);
+
+    for (int x=to; x!=from ;x=out->od[x])
+        printf("<-%d", out->od[x]);
+
+    free(g);
+    free(out->droga);
+    free(out->od);
+    free(out->odwiedzone);
+    free(out);
 }
 
 void zachowanie_check(FILE *plik)

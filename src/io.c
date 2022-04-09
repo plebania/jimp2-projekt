@@ -28,6 +28,8 @@ struct graf *wczytaj_graf(FILE *in)
     fscanf(in, "%d %d", &w, &h);
 
     g = init_graf(w * h);
+    g->w=w;
+    g->h=h;
     g->cells = w * h;
     for (int x = 0; x < w * h; x++)
         g->tab[x] = init_td_krawedz(1);
@@ -45,5 +47,6 @@ struct graf *wczytaj_graf(FILE *in)
         fscanf(in, "%d%c%c%lf", &krawedz_do, &tmp3, &tmp4, &waga);
         g->tab[krawedz_od] = dodaj_k(g->tab[krawedz_od], init_k(krawedz_do, waga));
     }
+    fclose(in);
     return g;
 }

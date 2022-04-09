@@ -1,55 +1,61 @@
 #include "graf_fun.h"
 #include <stdlib.h>
-#define INFTY 999999
+#define INFTY 9999 //w math.h jest zdefiniowana
 #include "stdio.h"
 
-struct stos
+struct kolejka
 {
-    int *tab, cells, size;
+struct kolejka *next;
+int w;
 };
 
-struct stos *dodaj_w(struct stos *s, int w)
+struct kolejka *dodaj_w(struct kolejka *k, int w)
 {
-    if (s->cells >= s->size)
+struct kolejka *n_k=malloc(sizeof(struct kolejka));
+n_k->next=k;
+n_k->w=w;
+return n_k;
+}
+
+struct kolejka *zdejmij_w(struct kolejka *k)
     {
-        s->size *= 2;
-        s->tab = realloc(s->tab, sizeof(int) * s->size);
+    struct kolejka *pom=NULL;
+    if (!k)
+        return pom;
+    pom=k->next;
+    free(k);
+    k=pom;
+    return k;
     }
-    s->tab[s->cells] = w;
-    s->cells++;
-    return s;
+
+
+
+struct kolejka *init_kolejka()
+{
+    struct kolejka *k = malloc(sizeof(struct kolejka));
+    k->next=NULL;
+    k->w=-1;
+    return k;
 }
 
-int zdejmij_w(struct stos *s)
+void free_kolejka(struct kolejka *k)
 {
-    if (s->cells)
-    {
-        s->cells--;
-        return s->tab[s->cells];
-    }
-    return -1;
-}
-
-struct stos *init_stos(unsigned int min_size)
-{
-    struct stos *s = malloc(sizeof(struct stos));
-    s->cells = 0;
-    unsigned int size = 1;
-    while (size < min_size)
-        size *= 2;
-    s->size = size;
-    s->tab = malloc(sizeof(int) * size);
-    return s;
-}
-
-void free_stos(struct stos *s)
-{
-    free(s->tab);
+    struct kolejka *pom=NULL;
+    if (k)
+        {
+        while(k->next)
+            {
+            pom=k->next;
+            free(k);
+            k=pom;
+            }
+        free(k);
+        }
 }
 
 struct bfs_out *bfs(struct graf *g, int od)
 {
-    struct stos *s = init_stos(g->cells);
+    struct kolejka *k = init_kolejka();
     struct bfs_out *out = NULL;
     if (od >= g->cells)
         return out;
@@ -64,11 +70,13 @@ struct bfs_out *bfs(struct graf *g, int od)
         out->zwiedzone[x] = 0;
     }
     out->odleglosc[od] = 0;
-    s = dodaj_w(s, od);
+    k ->w= od;
     int w, v;
-    while (s->cells)
+    while (k)
     {
-        w = zdejmij_w(s);
+        w=k->w;
+        k = zdejmij_w(k);
+        
         for (int y = 0; y < g->tab[w]->cells; y++)
         {
             v = g->tab[w]->tab[y]->_do;
@@ -77,19 +85,18 @@ struct bfs_out *bfs(struct graf *g, int od)
                 out->zwiedzone[v] = 1;
                 out->odleglosc[v] = out->odleglosc[w] + 1;
                 out->poprzednik[v] = w;
-                s = dodaj_w(s, v);
+                k = dodaj_w(k, v);
             }
         }
         out->zwiedzone[w] = 2;
     }
-    free_stos(s);
-    free(s);
+    free_kolejka(k);
     return out;
 }
-/*
+
 struct kopiec
 {
-    int *from, *to;
+    int *od;
     double *droga;
     int size, cells;
 };
@@ -102,40 +109,20 @@ struct kopiec *init_kopiec(int min_size)
     while (size < min_size)
         size *= 2;
     k->size = size;
-    k->from = malloc(sizeof(int) * size);
-    k->to = malloc(sizeof(int) * size);
+    k->od = malloc(sizeof(int) * size);
     k->droga = malloc(sizeof(double) * size);
     return k;
 }
 
-struct kopiec *min_heapyfy(struct kopiec *k)
-{
-    for (int x = 1; x < k->cells; x++)
-    {
-        int pom = x;
-        while (k->droga[pom] > k->droga[(pom - 1) / 2])
-        {
-
-            int pom1 = k->droga[pom];
-            k->droga[pom] = k->droga[(pom - 1) / 2];
-            k->droga[(pom - 1) / 2] = pom1;
-            pom = (pom - 1) / 2;
-        }
-    }
-    return k;
-}
-
-struct kopiec *kopiec_dodaj(struct kopiec *k, int from, int to, double droga)
+struct kopiec *kopiec_dodaj(struct kopiec *k, int od, double droga)
 {
     if (k->cells >= k->size)
     {
         k->size *= 2;
-        k->from = realloc(k->from, sizeof(int) * k->size);
-        k->to = realloc(k->to, sizeof(int) * k->size);
+        k->od = realloc(k->od, sizeof(int) * k->size);
         k->droga = realloc(k->droga, sizeof(double) * k->size);
     }
-    k->from[k->cells] = from;
-    k->to[k->cells] = to;
+    k->od[k->cells] = od;
     k->droga[k->cells] = droga;
     k->cells++;
     for (int x = k->cells - 1; x > 0;)
@@ -143,19 +130,16 @@ struct kopiec *kopiec_dodaj(struct kopiec *k, int from, int to, double droga)
         int pom = (x - 1) / 2;
         if (k->droga[x] < k->droga[pom])
         {
-            int pom_from, pom_to;
+            int pom_od;
             double pom_droga;
 
-            pom_from = k->from[pom];
-            pom_to = k->to[pom];
+            pom_od = k->od[pom];
             pom_droga = k->droga[pom];
 
-            k->from[pom] = k->from[x];
-            k->to[pom] = k->to[x];
+            k->od[pom] = k->od[x];
             k->droga[pom] = k->droga[x];
 
-            k->from[x] = pom_from;
-            k->to[x] = pom_to;
+            k->od[x] = pom_od;
             k->droga[x] = pom_droga;
         }
         else
@@ -167,13 +151,13 @@ struct kopiec *kopiec_dodaj(struct kopiec *k, int from, int to, double droga)
 
 struct kopiec *kopiec_zdejmij(struct kopiec *k)
 {
-    int old_root = k->droga[0];
+    double old_root = k->droga[0];
     k->droga[0] = k->droga[k->cells - 1];
     k->cells--;
     for (int x = 0; x < k->cells - 1;)
     {
         int pom1 = x * 2 + 1;
-        int pom = k->droga[pom1];
+        double pom = k->droga[pom1];
         if (pom1 < k->cells - 1)
             if (k->droga[pom1 + 1] < pom)
             {
@@ -183,7 +167,7 @@ struct kopiec *kopiec_zdejmij(struct kopiec *k)
 
         if (k->droga[x] > pom)
         {
-            int pom2 = k->droga[x];
+            double pom2 = k->droga[x];
             k->droga[x] = pom;
             k->droga[pom1] = pom2;
         }
@@ -193,41 +177,70 @@ struct kopiec *kopiec_zdejmij(struct kopiec *k)
     // return old_root;
 }
 
-struct dijkstra_out
-{
-    int *od;
-    double *droga;
-};
+void wypisz_kopiec(struct kopiec* k)
+    {
+    for (int x=0; x<k->cells; x++)
+        {
+            printf("%lf ", k->droga[x]);
+            /*
+        for (int y=x; y<x+x+1|| y<k->cells; y++)
+            printf("%lf ", k->droga[y]);
+        printf("\n");*/
+        }
+    }
+
+void free_kopiec(struct kopiec *k)
+    {
+    free(k->od);
+    free(k->droga);
+    }
 
 struct dijkstra_out *dijkstra(struct graf *g, int od)
 {
+
     struct kopiec *k = init_kopiec(g->cells);
     struct dijkstra_out *out = NULL;
+    
     if (od >= g->cells)
         return out;
+    
+    out=malloc(sizeof(struct dijkstra_out));
     out->od = malloc(sizeof(int) * g->cells);
     out->droga = malloc(sizeof(double) * g->cells);
+    out->odwiedzone=malloc(sizeof(unsigned short int)*g->cells);
+    
+    out->cells=g->cells; //TODO sprawdz czy ma sens dla grafow nie spojnych
     for (int x = 0; x < g->cells; x++)
-        out->droga = INFTY;
-    k = kopiec_dodaj(k, 0, 0, 0);
+        {
+        out->droga[x] = INFTY;
+        out->odwiedzone[x]=0;
+        }
+    k = kopiec_dodaj(k, od, 0);
+    out->od[od] = 0;
+    out->droga[od]=0;
     int w, v;
     double waga;
+    
     while (k->cells)
     {
-        w = k->from[0];
+        w = k->od[0];
         k = kopiec_zdejmij(k);
 
         for (int y = 0; y < g->tab[w]->cells; y++)
         {
             v = g->tab[w]->tab[y]->_do;
             waga = g->tab[w]->tab[y]->waga;
-            if (out->droga[w] + waga < out->droga[v])
+            if ( out->droga[w] + waga < out->droga[v])  //TODO odwiedzone
             {
                 out->droga[v] = out->droga[w] + waga;
                 out->od[v] = w;
-                k = kopiec_dodaj(k, w, v, waga);
+                out->odwiedzone[w]=2;
+                out->odwiedzone[v]=1;
+                k = kopiec_dodaj(k, v, waga);
             }
         }
     }
+    free_kopiec(k);
+    free(k);
     return out;
-}*/
+}
