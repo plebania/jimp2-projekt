@@ -27,6 +27,12 @@ struct graf *wczytaj_graf(FILE *in)
     int w, h;
     fscanf(in, "%d %d", &w, &h);
 
+    if(w<=0 || h<=0)
+    {
+        fprintf(stderr, "Bledny format pliku wczytywanego!\n");
+        return g;
+    }
+
     g = init_graf(w * h);
     g->w=w;
     g->h=h;

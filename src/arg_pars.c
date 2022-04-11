@@ -7,6 +7,28 @@
 #include "io.h"
 #include "graf_fun.h"
 #include "arg_pars.h"
+
+void instrukcja()
+{
+    fprintf(stderr, "\n");
+    fprintf(stderr, "INSTRUKCJA:\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr,"Streszczenie:\n");
+    fprintf(stderr, "\tgraph make file_out {{width | w} | val1} {{height | h} val2  | val2} --weight_min val --weight_max val\n");
+    fprintf(stderr, "\tgraph check file_in\n");
+    fprintf(stderr, "\tgraph path file_in from_x val from_y val to_x val to_y val\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "graph make file_out width height [args]...\n");
+    fprintf(stderr, "\tpolecenie tworzące graf o zadanych parametrach, zapisujące go do pliku file_out\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "graph check file_in\n");
+    fprintf(stderr, "\tpolecenie zwraca logiczną wartość 1 jeśli graf w pliku wejściowym file_in jest koherentny i 0 jeśli nie jest\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "graph path file_in {from_x val1 from_y val2 to_x val3 to_y val4 | val1 val2 val3 val4}\n");
+    fprintf(stderr, "\tpolecenie wypisujące najkrtótszą ścieżkę między podanymi w parametrach wierzchołkami grafu\n");
+    fprintf(stderr, "\n");
+}
+
 int czy_double(char *napis)
 {
     if (!isdigit(napis[0]))
@@ -40,12 +62,13 @@ void zachowanie_make(FILE *plik, int w, int h, double min_wag, double max_wag)
 
 void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
 {
-    struct graf *g=wczytaj_graf(plik);
-    int from=from_x+from_y*g->w, to=to_x+to_y*g->w;
-    struct dijkstra_out *out=dijkstra(g, from);
+    struct graf *g = wczytaj_graf(plik);
+    if (g == NULL) return;
+    int from = from_x + from_y * g->w, to = to_x + to_y * g->w;
+    struct dijkstra_out *out = dijkstra(g, from);
     printf("Długosci: %lf\nDroga: %d", out->droga[to], to);
 
-    for (int x=to; x!=from ;x=out->od[x])
+    for (int x = to; x != from; x = out->od[x])
         printf("<-%d", out->od[x]);
 
     free(g);
@@ -57,24 +80,25 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
 
 void zachowanie_check(FILE *plik)
 {
-
     struct graf *g = wczytaj_graf(plik);
+    if (g == NULL) return;
     struct bfs_out *out;
     out = bfs(g, 0);
     for (int x = 0; x < g->cells; x++)
         if (out->zwiedzone[x] != 2)
         {
-            printf("0");
+            printf("Graf niespojny");
             return;
         }
-    printf("1");
+    printf("Graf spojny");
 }
 
 int arg_parse(int argc, char *argv[])
 {
     if (argc < 3)
     {
-        printf("Za mała ilość argumentów, nie mamy jeszcze instrukcji\n");
+        printf("Za mała ilość argumentów\n");
+        instrukcja();
         return 1;
     }
     FILE *out_or_in;
@@ -86,6 +110,7 @@ int arg_parse(int argc, char *argv[])
         if (argc < 5)
         {
             fprintf(stderr, "Niepoprawna ilosc argumnetow\n");
+            instrukcja();
             return 1;
         }
 
@@ -94,6 +119,7 @@ int arg_parse(int argc, char *argv[])
         if (argc < 5)
         {
             printf("za mało argumentów wywołania\n");
+            instrukcja();
             return 1;
         }
         // Szukam argumentów
@@ -110,6 +136,7 @@ int arg_parse(int argc, char *argv[])
                 else
                 {
                     printf("Po argumencie --weight_min spodziewana jest wartość\n");
+                    instrukcja();
                     return 1;
                 }
             }
@@ -124,6 +151,7 @@ int arg_parse(int argc, char *argv[])
                 else
                 {
                     printf("Po argumencie --weight_max spodziewana jest wartość\n");
+                    instrukcja();
                     return 1;
                 }
             }
@@ -141,6 +169,7 @@ int arg_parse(int argc, char *argv[])
             else
             {
                 fprintf(stderr, "Nie podano parametru height\n");
+                instrukcja();
                 return 1;
             }
         }
@@ -165,7 +194,10 @@ int arg_parse(int argc, char *argv[])
                 }
             }
             else if (argc != 7 + poz_par)
+            {
                 printf("Bledne argumenty wywołania, instrukcja\n");
+                instrukcja();
+            }
         }
         zachowanie_make(out_or_in, w, h, min_wag, max_wag);
     }
@@ -192,6 +224,7 @@ int arg_parse(int argc, char *argv[])
             else
             {
                 printf("Błędne argumenty wywołania\n");
+                instrukcja();
                 return 1;
             }
         }
@@ -258,7 +291,8 @@ int arg_parse(int argc, char *argv[])
         }
         else
         {
-            printf("Błędne argumenty, instruckja\n");
+            printf("Błędne argumenty\n");
+            instrukcja();
             return 1;
         }
         zachowanie_path(out_or_in, from_x, from_y, to_x, to_y);
@@ -266,6 +300,7 @@ int arg_parse(int argc, char *argv[])
     else
     {
         fprintf(stderr, "Blad, brak zprecyzowanego dzialania programu\n");
+        instrukcja();
         return 1;
     }
     return 0;
