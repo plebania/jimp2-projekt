@@ -4,7 +4,7 @@ Graph
 
 Streszczenie
 
-graph make file_out {{width | w} | val1} {{height | h} val2  | val2} --weight_min val --weight_max val
+graph make file_out { {width | w} | val1} { {height | h} val2  | val2} --weight_min val --weight_max val
 graph check file_in
 graph path file_in from_x val from_y val to_x val to_y val
 
@@ -67,6 +67,8 @@ Komunikaty błędów:
 
 Dokumentacja implementacyjna:
 
+
+Graf jest przechowywany w formie listy sąsiedztwa o krawędziach skierowanych, aby stworzyć graf nieskierowany nalerzy dla każdej jego krawędzi w1-w2 stworzyć krawędź skierowaną w1->w2, oraz w2->w1 o tych samych wagach. Polecenie make graph tworzy w ten sposób krawędzie nieskierowane.
 
 Moduły
 
