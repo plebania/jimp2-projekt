@@ -1,4 +1,4 @@
-graph: main.o graf.o graf_fun.o io.o arg_pars.o
+graph: main.o graf.o graf_fun.o io.o arg_pars.o testy.o
 	cc *.o -o graph
 
 main.o: src/main.c
@@ -15,6 +15,9 @@ io.o: src/io.c src/io.h
 
 arg_pars.o: src/arg_pars.c src/arg_pars.h
 	cc -c src/arg_pars.c
+
+testy.o: src/testy.c src/testy.h
+	cc -c src/testy.c
 
 clean:
 	rm *.o graph

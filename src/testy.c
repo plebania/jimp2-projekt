@@ -25,20 +25,21 @@ int test1_kopiec(int ile, double od, double _do)
     return EXIT_SUCCESS;
 }
 
-void test1_kolejka(int ile)
+int test1_kolejka(int ile)
 {
     struct kolejka *k;
     k = init_kolejka();
 
     for (int x = 0; x < ile; x++)
-    {
         k = dodaj_w(k, x);
-        k->w = x;
-    }
-    while (k)
+
+    int pom;
+    while(k)
     {
-        printf("%d\n", k->w);
+        pom = k->w;
         k = zdejmij_w(k);
     }
+
     free_kolejka(k);
+    return EXIT_SUCCESS;
 }

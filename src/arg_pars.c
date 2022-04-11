@@ -7,6 +7,7 @@
 #include "io.h"
 #include "graf_fun.h"
 #include "arg_pars.h"
+#include "testy.h"
 
 void instrukcja()
 {
@@ -296,6 +297,53 @@ int arg_parse(int argc, char *argv[])
             return 1;
         }
         zachowanie_path(out_or_in, from_x, from_y, to_x, to_y);
+    }
+    else if (strcmp(argv[1], "test") == 0)
+    {
+    for (int x=2; x<argc; x++)
+        {
+        if (strcmp(argv[x], "--kopiec") == 0 )
+            {
+            int ile;
+            double od;
+            double _do;
+            if (x+3>=argc)
+                {
+                printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
+                return 1;
+                }
+            if (czy_int(argv[x+1]) && czy_double(argv[x+2]) && czy_double(argv[x+2]) )
+                printf("Test kopiec: %s\n", test1_kopiec(atoi(argv[x+1]), atof(argv[x+2]), atof(argv[x+3]))==0?"OK":"BŁĄD");
+            else
+                {
+                printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
+                return 1;
+                }
+            x+=3;
+            }
+        else if (strcmp(argv[x], "--kolejka") == 0)
+            {
+            int ile;
+            if (x+1>=argc)
+                {
+                printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
+                return 1;
+                }
+            if (czy_int(argv[x+1]))
+                printf("Test kolejka: %s\n", test1_kolejka(atoi(argv[x+1])) == 0 ? "OK" : "BŁĄD");
+            else
+                {
+                printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
+                return 1;
+                }
+            x++;
+            }
+        else
+            {
+            //todo instrukcja test
+            return 1;
+            }
+        }
     }
     else
     {
