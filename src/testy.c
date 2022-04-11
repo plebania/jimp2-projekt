@@ -25,24 +25,6 @@ int test1_kopiec(int ile, double od, double _do)
     return EXIT_SUCCESS;
 }
 
-// void test1_kolejka(int ile)
-// {
-//     struct kolejka *k;
-//     k = init_kolejka();
-
-//     for (int x = 0; x < ile; x++)
-//     {
-//         k = dodaj_w(k, x);
-//     }
-
-//     while (k)
-//     {
-//         k = zdejmij_w(k);
-//         printf
-//     }
-//     free(k);
-// }
-
 void test1_kolejka(int ile)
 {
     struct kolejka *k;
