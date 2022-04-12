@@ -3,6 +3,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
 #include "graf.h"
 #include "io.h"
 #include "graf_fun.h"
@@ -11,7 +12,6 @@
 #define ANSI_KOLOR_CZERWONY "\x1b[31m"
 #define ANSI_KOLOR_ZIELONY "\x1b[32m"
 #define ANSI_KOLOR_RESET "\x1b[0m"
-
 
 void instrukcja()
 {
@@ -36,7 +36,7 @@ void instrukcja()
 
 int czy_double(char *napis)
 {
-    if (!isdigit(napis[0]) && napis[0]!='-')
+    if (!isdigit(napis[0]) && napis[0] != '-')
         return 0;
     int x;
     for (x = 1; napis[x] != '\0'; x++)
@@ -73,13 +73,15 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
         return;
     int from = from_x + from_y * g->w, to = to_x + to_y * g->w;
     struct dijkstra_out *out = dijkstra(g, from);
-    printf("Długość: %lf\nDroga: %d", out->droga[to], to);
-
+    if (out->droga[to] < __DBL_MAX__)
+        printf("Długość: %lf\nDroga: %d", out->droga[to], to);
+    else
+        printf("Nie nma połączenia między wierzchołkami\n");
     for (int x = to; x != from; x = out->od[x])
     // for (int x = 0; x < 100; x++)
     {
         printf("<-%d", out->od[x]);
-    //     printf("(%d,%d)", x, out->od[x]);
+        //     printf("(%d,%d)", x, out->od[x]);
     }
     printf("\n");
 

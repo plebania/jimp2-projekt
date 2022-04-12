@@ -5,7 +5,8 @@
 
 struct bfs_out
 {
-    int *poprzednik, *odleglosc, *zwiedzone;
+    int *poprzednik,  *zwiedzone;
+    double *odleglosc;
 };
 
 struct dijkstra_out

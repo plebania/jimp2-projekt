@@ -1,6 +1,7 @@
 #include "graf_fun.h"
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
 #include "stdio.h"
 
 struct kolejka *dodaj_w(struct kolejka *k, int w)
@@ -53,11 +54,11 @@ struct bfs_out *bfs(struct graf *g, int od)
         return out;
     out = malloc(sizeof(struct bfs_out));
     out->poprzednik = malloc(sizeof(int) * (g->cells));
-    out->odleglosc = malloc(sizeof(int) * (g->cells));
+    out->odleglosc = malloc(sizeof(double) * (g->cells));
     out->zwiedzone = malloc(sizeof(int) * (g->cells));
     for (int x = 0; x < g->cells; x++)
     {
-        out->odleglosc[x] = INFINITY;
+        out->odleglosc[x] = __DBL_MAX__;
         out->poprzednik[x] = 0;
         out->zwiedzone[x] = 0;
     }
@@ -174,7 +175,7 @@ struct dijkstra_out *dijkstra(struct graf *g, int od)
     out->cells = g->cells; // TODO sprawdz czy ma sens dla grafow nie spojnych
     for (int x = 0; x < g->cells; x++)
     {
-        out->droga[x] = INFINITY;
+        out->droga[x] = __DBL_MAX__;
         out->odwiedzone[x] = 0;
     }
     k = kopiec_dodaj(k, od, 0);
