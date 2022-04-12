@@ -117,10 +117,25 @@ Funkcje:
     
 Testy:
 
-    Poprawność działania funkcji zawartych w modułach programu będzie testowana przy pomocy testów jednostkowych.
-    Testy zostaną podzielone na zestawy. Każdy zestaw będzie grupował testy dotyczącej danej części projektu. Dzięki podziałowi testów łatwiej będzie zidentyfikować kod wywołujący problem.
+    Poprawność działania funkcji zawartych w modułach programu będzie testowana przy pomocy testów funkcjonalnych.
+    Każdy funkcja będzie posiadała swój test dotyczącej danej części projektu. Dzięki podziałowi testów łatwiej będzie zidentyfikować kod wywołujący problem.
 
+    Wywoływanie testów zostało zamieszczone w pliku makefile:
 
+    make test1
+        sprawdza funkcjnalność kopca uzywanego w dijkstrze
+    
+    make test2
+        sprawdza funkcjnalność kolejki uzywanej w bfs
+    
+    make test3
+        sprawdza funkcjnalność funkcji tworzącej graf
+
+    make test4
+        sprawdza funkcjnalność algorytmu bfs na podstawie sprawdzania funkcjnalności spójności grafu
+
+    make test5
+        sprawdza funkcjnalność algorytmu Dijkstry na podstawie wyznaczanie najkrótszej ścieżki w grafie
 
 Repozytorium:
 

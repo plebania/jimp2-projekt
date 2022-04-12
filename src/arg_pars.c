@@ -8,13 +8,17 @@
 #include "graf_fun.h"
 #include "arg_pars.h"
 #include "testy.h"
+#define ANSI_KOLOR_CZERWONY "\x1b[31m"
+#define ANSI_KOLOR_ZIELONY "\x1b[32m"
+#define ANSI_KOLOR_RESET "\x1b[0m"
+
 
 void instrukcja()
 {
     fprintf(stderr, "\n");
     fprintf(stderr, "INSTRUKCJA:\n");
     fprintf(stderr, "\n");
-    fprintf(stderr,"Streszczenie:\n");
+    fprintf(stderr, "Streszczenie:\n");
     fprintf(stderr, "\tgraph make file_out {{width | w} | val1} {{height | h} val2  | val2} --weight_min val --weight_max val\n");
     fprintf(stderr, "\tgraph check file_in\n");
     fprintf(stderr, "\tgraph path file_in from_x val from_y val to_x val to_y val\n");
@@ -32,7 +36,7 @@ void instrukcja()
 
 int czy_double(char *napis)
 {
-    if (!isdigit(napis[0]))
+    if (!isdigit(napis[0]) && napis[0]!='-')
         return 0;
     int x;
     for (x = 1; napis[x] != '\0'; x++)
@@ -58,19 +62,25 @@ void zachowanie_make(FILE *plik, int w, int h, double min_wag, double max_wag)
     g->w = w;
     g->h = h;
     zapisz_graf(plik, g);
-    free_graf(g);
+    free(g);
 }
 
 void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
 {
     struct graf *g = wczytaj_graf(plik);
-    if (g == NULL) return;
+    if (g == NULL)
+        return;
     int from = from_x + from_y * g->w, to = to_x + to_y * g->w;
     struct dijkstra_out *out = dijkstra(g, from);
-    printf("Długosci: %lf\nDroga: %d", out->droga[to], to);
+    printf("Długość: %lf\nDroga: %d", out->droga[to], to);
 
-    for (int x = to; x != from; x = out->od[x])
-        printf("<-%d", out->od[x]);
+    // for (int x = to; x != from; x = out->od[x])
+    // for (int x = 0; x < 100; x++)
+    // {
+    //     //printf("<-%d", out->od[x]);
+    //     printf("(%d,%d)", x, out->od[x]);
+    //}
+    printf("\n");
 
     free(g);
     free(out->droga);
@@ -82,16 +92,19 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
 void zachowanie_check(FILE *plik)
 {
     struct graf *g = wczytaj_graf(plik);
-    if (g == NULL) return;
+    if (g == NULL)
+        return;
     struct bfs_out *out;
     out = bfs(g, 0);
     for (int x = 0; x < g->cells; x++)
         if (out->zwiedzone[x] != 2)
         {
             printf("Graf niespojny");
+            free(g);
             return;
         }
     printf("Graf spojny");
+    free(g);
 }
 
 int arg_parse(int argc, char *argv[])
@@ -102,7 +115,7 @@ int arg_parse(int argc, char *argv[])
         instrukcja();
         return 1;
     }
-    FILE *out_or_in;
+    FILE *out_or_in = NULL;
 
     if (strcmp(argv[1], "make") == 0)
     {
@@ -111,6 +124,8 @@ int arg_parse(int argc, char *argv[])
         if (argc < 5)
         {
             fprintf(stderr, "Niepoprawna ilosc argumnetow\n");
+            if (out_or_in)
+                fclose(out_or_in);
             instrukcja();
             return 1;
         }
@@ -120,6 +135,8 @@ int arg_parse(int argc, char *argv[])
         if (argc < 5)
         {
             printf("za mało argumentów wywołania\n");
+            if (out_or_in)
+                fclose(out_or_in);
             instrukcja();
             return 1;
         }
@@ -137,6 +154,8 @@ int arg_parse(int argc, char *argv[])
                 else
                 {
                     printf("Po argumencie --weight_min spodziewana jest wartość\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
                     instrukcja();
                     return 1;
                 }
@@ -152,6 +171,8 @@ int arg_parse(int argc, char *argv[])
                 else
                 {
                     printf("Po argumencie --weight_max spodziewana jest wartość\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
                     instrukcja();
                     return 1;
                 }
@@ -170,6 +191,8 @@ int arg_parse(int argc, char *argv[])
             else
             {
                 fprintf(stderr, "Nie podano parametru height\n");
+                if (out_or_in)
+                    fclose(out_or_in);
                 instrukcja();
                 return 1;
             }
@@ -184,6 +207,14 @@ int arg_parse(int argc, char *argv[])
                     w = atoi(argv[4 + poz_par]);
                     h = atoi(argv[6 + poz_par]);
                 }
+                else
+                {
+                    printf("Bledne argumenty wywołania, instrukcja\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
+                    instrukcja();
+                    return 1;
+                }
             }
             // polecenie postaci graph make plik [arg]... {h | height} val {w | width} val
             else if (strcmp(argv[5 + poz_par], "width") == 0 || strcmp(argv[5 + poz_par], "w") == 0)
@@ -193,12 +224,31 @@ int arg_parse(int argc, char *argv[])
                     w = atoi(argv[4 + poz_par]);
                     h = atoi(argv[6 + poz_par]);
                 }
+                else
+                {
+                    printf("Bledne argumenty wywołania, instrukcja\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
+                    instrukcja();
+                    return 1;
+                }
             }
-            else if (argc != 7 + poz_par)
+            else
             {
                 printf("Bledne argumenty wywołania, instrukcja\n");
+                if (out_or_in)
+                    fclose(out_or_in);
                 instrukcja();
+                return 1;
             }
+        }
+        else
+        {
+            printf("Bledne argumenty wywołania, instrukcja\n");
+            if (out_or_in)
+                fclose(out_or_in);
+            instrukcja();
+            return 1;
         }
         zachowanie_make(out_or_in, w, h, min_wag, max_wag);
     }
@@ -225,6 +275,8 @@ int arg_parse(int argc, char *argv[])
             else
             {
                 printf("Błędne argumenty wywołania\n");
+                if (out_or_in)
+                    fclose(out_or_in);
                 instrukcja();
                 return 1;
             }
@@ -241,6 +293,9 @@ int arg_parse(int argc, char *argv[])
                         if (byl_from_x)
                         {
                             printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                            if (out_or_in)
+                                fclose(out_or_in);
+                            instrukcja();
                             return 1;
                         }
                         byl_from_x = 1;
@@ -252,6 +307,9 @@ int arg_parse(int argc, char *argv[])
                         if (byl_from_y)
                         {
                             printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                            if (out_or_in)
+                                fclose(out_or_in);
+                            instrukcja();
                             return 1;
                         }
                         byl_from_y = 1;
@@ -262,6 +320,9 @@ int arg_parse(int argc, char *argv[])
                         if (byl_to_x)
                         {
                             printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                            if (out_or_in)
+                                fclose(out_or_in);
+                            instrukcja();
                             return 1;
                         }
                         byl_to_x = 1;
@@ -272,6 +333,9 @@ int arg_parse(int argc, char *argv[])
                         if (byl_to_y)
                         {
                             printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                            if (out_or_in)
+                                fclose(out_or_in);
+                            instrukcja();
                             return 1;
                         }
                         byl_to_y = 1;
@@ -280,6 +344,9 @@ int arg_parse(int argc, char *argv[])
                     else
                     {
                         printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                        if (out_or_in)
+                            fclose(out_or_in);
+                        instrukcja();
                         return 1;
                     }
                 }
@@ -287,12 +354,17 @@ int arg_parse(int argc, char *argv[])
             else
             {
                 printf("błąd, po from_x, from_y, to_x, to_y oczekiwana jest watość parametru typu double\n");
+                if (out_or_in)
+                    fclose(out_or_in);
+                instrukcja();
                 return 1;
             }
         }
         else
         {
             printf("Błędne argumenty\n");
+            if (out_or_in)
+                fclose(out_or_in);
             instrukcja();
             return 1;
         }
@@ -300,54 +372,66 @@ int arg_parse(int argc, char *argv[])
     }
     else if (strcmp(argv[1], "test") == 0)
     {
-    for (int x=2; x<argc; x++)
+        for (int x = 2; x < argc; x++)
         {
-        if (strcmp(argv[x], "--kopiec") == 0 )
+            if (strcmp(argv[x], "--kopiec") == 0)
             {
-            int ile;
-            double od;
-            double _do;
-            if (x+3>=argc)
+                if (x + 3 >= argc)
                 {
-                printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
-                return 1;
+                    printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
+                    instrukcja();
+                    return 1;
                 }
-            if (czy_int(argv[x+1]) && czy_double(argv[x+2]) && czy_double(argv[x+2]) )
-                printf("Test kopiec: %s\n", test1_kopiec(atoi(argv[x+1]), atof(argv[x+2]), atof(argv[x+3]))==0?"OK":"BŁĄD");
-            else
+                if (czy_int(argv[x + 1]) && czy_double(argv[x + 2]) && czy_double(argv[x + 2]))
+                    printf("%s\n", test1_kopiec(atoi(argv[x + 1]), atof(argv[x + 2]), atof(argv[x + 3])) == 0 ? ANSI_KOLOR_ZIELONY "OK" ANSI_KOLOR_RESET : ANSI_KOLOR_CZERWONY "BŁĄD" ANSI_KOLOR_RESET);
+                else
                 {
-                printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
-                return 1;
+                    printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
+                    instrukcja();
+                    return 1;
                 }
-            x+=3;
+                x += 3;
             }
-        else if (strcmp(argv[x], "--kolejka") == 0)
+            else if (strcmp(argv[x], "--kolejka") == 0)
             {
-            int ile;
-            if (x+1>=argc)
+                if (x + 1 >= argc)
                 {
-                printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
-                return 1;
+                    printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
+                    instrukcja();
+                    return 1;
                 }
-            if (czy_int(argv[x+1]))
-                printf("Test kolejka: %s\n", test1_kolejka(atoi(argv[x+1])) == 0 ? "OK" : "BŁĄD");
-            else
+                if (czy_int(argv[x + 1]))
+                    printf("%s\n", test1_kolejka(atoi(argv[x + 1])) == 0 ? ANSI_KOLOR_ZIELONY "OK" ANSI_KOLOR_RESET : ANSI_KOLOR_CZERWONY "BŁĄD" ANSI_KOLOR_RESET);
+                else
                 {
-                printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
-                return 1;
+                    printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
+                    if (out_or_in)
+                        fclose(out_or_in);
+                    instrukcja();
+                    return 1;
                 }
-            x++;
+                x++;
             }
-        else
+            else
             {
-            //todo instrukcja test
-            return 1;
+                if (out_or_in)
+                    fclose(out_or_in);
+                instrukcja();
+                return 1;
             }
         }
     }
     else
     {
-        fprintf(stderr, "Blad, brak zprecyzowanego dzialania programu\n");
+        fprintf(stderr, "Błąd, brak zprecyzowanego dzialania programu\n");
+        if (out_or_in)
+            fclose(out_or_in);
         instrukcja();
         return 1;
     }

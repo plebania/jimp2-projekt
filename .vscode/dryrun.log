@@ -1,0 +1,5 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory `/Users/mikolajguzik/Documents/GitHub/jimp2-projekt'
+make: `bin/graph' is up to date.
+make: Leaving directory `/Users/mikolajguzik/Documents/GitHub/jimp2-projekt'
+ 

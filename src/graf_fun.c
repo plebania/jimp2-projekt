@@ -1,6 +1,6 @@
 #include "graf_fun.h"
 #include <stdlib.h>
-#define INFTY 9999 // w math.h jest zdefiniowana
+#include <math.h>
 #include "stdio.h"
 
 struct kolejka *dodaj_w(struct kolejka *k, int w)
@@ -57,7 +57,7 @@ struct bfs_out *bfs(struct graf *g, int od)
     out->zwiedzone = malloc(sizeof(int) * (g->cells));
     for (int x = 0; x < g->cells; x++)
     {
-        out->odleglosc[x] = INFTY;
+        out->odleglosc[x] = INFINITY;
         out->poprzednik[x] = 0;
         out->zwiedzone[x] = 0;
     }
@@ -99,70 +99,54 @@ struct kopiec *init_kopiec(unsigned int min_size)
     return k;
 }
 
-struct kopiec *kopiec_dodaj(struct kopiec *k, int od, double droga)
-{
-    if (k->cells >= k->size)
+struct kopiec * kopiec_dodaj(struct kopiec *k, int od, double waga)
     {
-        k->size *= 2;
-        k->od = realloc(k->od, sizeof(int) * k->size);
-        k->droga = realloc(k->droga, sizeof(double) * k->size);
-    }
-    k->od[k->cells] = od;
-    k->droga[k->cells] = droga;
+    int i, j;
+    i=k->cells;
     k->cells++;
-    for (int x = k->cells - 1; x > 0;)
-    {
-        int pom = (x - 1) / 2;
-        if (k->droga[x] < k->droga[pom])
+    j=(i-1)/2;
+    while (i>0 && k->droga[j]>waga)
         {
-            int pom_od;
-            double pom_droga;
-
-            pom_od = k->od[pom];
-            pom_droga = k->droga[pom];
-
-            k->od[pom] = k->od[x];
-            k->droga[pom] = k->droga[x];
-
-            k->od[x] = pom_od;
-            k->droga[x] = pom_droga;
+        k->droga[i]=k->droga[j];
+        k->od[i]=k->od[j];
+        i=j;
+        j=(i-1)/2;
         }
-        else
-            break;
-        x = pom;
-    }
+    k->droga[i]=waga;
+    k->od[i]=od;
     return k;
-}
+    }
 
-struct kopiec *kopiec_zdejmij(struct kopiec *k)
-{
-    k->droga[0] = k->droga[k->cells - 1];
-    k->cells--;
-    for (int x = 0; x < k->cells - 1;)
+struct kopiec* kopiec_zdejmij(struct kopiec *k)
     {
-        int pom1 = x * 2 + 1;
-        double pom = k->droga[pom1];
-        if (pom1 < k->cells - 1)
-            if (k->droga[pom1 + 1] < pom)
+    int i=0,j=1, pom;
+    double v;
+    if (k->cells)
+        {
+        
+        k->cells--;
+        v=k->droga[k->cells];
+        pom=k->od[k->cells];
+        while (j<k->cells)
             {
-                pom1++;
-                pom = k->droga[pom1];
+            if (j+1<k->cells && k->droga[j+1]<k->droga[j])j++;
+            if (v<=k->droga[j])break;
+            k->droga[i]=k->droga[j];
+            k->od[i]=k->od[j];
+            i=j;
+            j=j*2+1;
             }
-
-        if (k->droga[x] > pom)
-        {
-            double pom2 = k->droga[x];
-            k->droga[x] = pom;
-            k->droga[pom1] = pom2;
+            k->droga[i]=v;
+            k->od[i]=pom;
         }
-        x = pom1;
-    }
+    
     return k;
-    // return old_root;
-}
+    }
+
 
 void wypisz_kopiec(struct kopiec *k)
 {
+    printf("cells:%d\n", k->cells);
     for (int x = 0; x < k->cells; x++)
         printf("%lf ", k->droga[x]);
 }
@@ -190,11 +174,11 @@ struct dijkstra_out *dijkstra(struct graf *g, int od)
     out->cells = g->cells; // TODO sprawdz czy ma sens dla grafow nie spojnych
     for (int x = 0; x < g->cells; x++)
     {
-        out->droga[x] = INFTY;
+        out->droga[x] = INFINITY;
         out->odwiedzone[x] = 0;
     }
     k = kopiec_dodaj(k, od, 0);
-    out->od[od] = 0;
+    out->od[od] = od;
     out->droga[od] = 0;
     int w, v;
     double waga;
@@ -203,10 +187,12 @@ struct dijkstra_out *dijkstra(struct graf *g, int od)
     {
         w = k->od[0];
         k = kopiec_zdejmij(k);
-
+        // wypisz_kopiec(k);
+        // printf("\nw %d\n", w);
         for (int y = 0; y < g->tab[w]->cells; y++)
         {
             v = g->tab[w]->tab[y]->_do;
+            // printf("%d", v);
             waga = g->tab[w]->tab[y]->waga;
             if (out->droga[w] + waga < out->droga[v]) // TODO odwiedzone
             {

@@ -22,20 +22,26 @@ void zapisz_graf(FILE *out, struct graf *g)
 
 struct graf *wczytaj_graf(FILE *in)
 {
+
     struct graf *g = NULL;
 
+    if (in == NULL)
+    {
+        fprintf(stderr, "Plik nie moze być pusty!\n");
+        return g;
+    }
     int w, h;
     fscanf(in, "%d %d", &w, &h);
 
-    if(w<=0 || h<=0)
+    if (w <= 0 || h <= 0)
     {
         fprintf(stderr, "Bledny format pliku wczytywanego!\n");
         return g;
     }
 
     g = init_graf(w * h);
-    g->w=w;
-    g->h=h;
+    g->w = w;
+    g->h = h;
     g->cells = w * h;
     for (int x = 0; x < w * h; x++)
         g->tab[x] = init_td_krawedz(1);
