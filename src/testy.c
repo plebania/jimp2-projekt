@@ -36,6 +36,7 @@ int test1_kolejka(int ile)
     for (int x = 0; x < ile; x++)
         k = dodaj_w(k, x);
 
+    int pom;
     while (k)
     {
         pom = k->w;
