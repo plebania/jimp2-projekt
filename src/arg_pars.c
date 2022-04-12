@@ -74,12 +74,12 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
     struct dijkstra_out *out = dijkstra(g, from);
     printf("Długość: %lf\nDroga: %d", out->droga[to], to);
 
-    // for (int x = to; x != from; x = out->od[x])
+    for (int x = to; x != from; x = out->od[x])
     // for (int x = 0; x < 100; x++)
-    // {
-    //     //printf("<-%d", out->od[x]);
+    {
+        printf("<-%d", out->od[x]);
     //     printf("(%d,%d)", x, out->od[x]);
-    //}
+    }
     printf("\n");
 
     free(g);

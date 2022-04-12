@@ -49,6 +49,7 @@ void free_td_krawedz(struct td_krawedz *tab_k)
 {
     for (int x = 0; x < tab_k->cells; x++)
         free(tab_k->tab[x]);
+    free(tab_k->tab);
     free(tab_k);
 }
 
