@@ -62,6 +62,7 @@ void zachowanie_make(FILE *plik, int w, int h, double min_wag, double max_wag)
     g->w = w;
     g->h = h;
     zapisz_graf(plik, g);
+    free_graf(g);
     free(g);
 }
 
@@ -82,6 +83,7 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
     }
     printf("\n");
 
+    free_graf(g);
     free(g);
     free(out->droga);
     free(out->od);
@@ -100,10 +102,12 @@ void zachowanie_check(FILE *plik)
         if (out->zwiedzone[x] != 2)
         {
             printf("Graf niespojny");
+            free_graf(g);
             free(g);
             return;
         }
     printf("Graf spojny");
+    free_graf(g);
     free(g);
 }
 
