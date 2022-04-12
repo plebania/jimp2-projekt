@@ -1,5 +1,11 @@
-make --dry-run --keep-going --print-directory
+make --dry-run --always-make --keep-going --print-directory
 make: Entering directory `/Users/mikolajguzik/Documents/GitHub/jimp2-projekt'
-make: `bin/graph' is up to date.
+cc  -I./inc -Wall -Wextra -pedantic -c src/arg_pars.c -o obj/arg_pars.o
+cc  -I./inc -Wall -Wextra -pedantic -c src/graf.c -o obj/graf.o
+cc  -I./inc -Wall -Wextra -pedantic -c src/graf_fun.c -o obj/graf_fun.o
+cc  -I./inc -Wall -Wextra -pedantic -c src/io.c -o obj/io.o
+cc  -I./inc -Wall -Wextra -pedantic -c src/main.c -o obj/main.o
+cc  -I./inc -Wall -Wextra -pedantic -c src/testy.c -o obj/testy.o
+cc -o bin/graph  ./obj/arg_pars.o ./obj/graf.o ./obj/graf_fun.o ./obj/io.o ./obj/main.o ./obj/testy.o
 make: Leaving directory `/Users/mikolajguzik/Documents/GitHub/jimp2-projekt'
  
