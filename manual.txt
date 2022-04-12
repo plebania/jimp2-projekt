@@ -120,7 +120,9 @@ Testy:
     Poprawność działania funkcji zawartych w modułach programu będzie testowana przy pomocy testów funkcjonalnych.
     Każdy funkcja będzie posiadała swój test dotyczącej danej części projektu. Dzięki podziałowi testów łatwiej będzie zidentyfikować kod wywołujący problem.
 
-    Wywoływanie testów zostało zamieszczone w pliku makefile za pomocą make test:
+    Wywoływanie testów zostało zamieszczone w pliku makefile za pomocą:
+
+    make test
 
     wywoływane testy sprawdzają dwie funckje:
         kopiec uzywany w dijkstrze
