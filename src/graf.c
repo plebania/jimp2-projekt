@@ -47,9 +47,15 @@ void wypisz_td_krawedz(struct td_krawedz *tab_k)
 
 void free_td_krawedz(struct td_krawedz *tab_k)
 {
-    for (int x = 0; x < tab_k->cells; x++)
-        free(tab_k->tab[x]);
-    free(tab_k->tab);
+    if (!tab_k)
+        return;
+    if (tab_k->tab)
+    {
+        for (int x = 0; x < tab_k->cells; x++)
+            if (tab_k->tab[x])
+                free(tab_k->tab[x]);
+        free(tab_k->tab);
+    }
     free(tab_k);
 }
 
@@ -112,8 +118,14 @@ struct graf *stworz_graf(int w, int h, double min_wag, double max_wag, unsigned 
 
 void free_graf(struct graf *g)
 {
-    for (int x = 0; x < g->size; x++)
-        if (g->tab[x] != NULL)
-            free_td_krawedz(g->tab[x]);
-    free(g->tab);
+    if (!g)
+        return;
+    if (g->tab)
+    {
+        for (int x = 0; x < g->size; x++)
+            if (g->tab[x])
+                free_td_krawedz(g->tab[x]);
+        free(g->tab);
+    }
+    free(g);
 }

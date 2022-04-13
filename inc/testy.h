@@ -6,5 +6,4 @@
 int test1_kopiec(int ile, double od, double _do);
 
 int test1_kolejka(int ile);
-
 #endif

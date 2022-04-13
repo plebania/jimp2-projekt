@@ -3,7 +3,6 @@
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
-#include <limits.h>
 #include "graf.h"
 #include "io.h"
 #include "graf_fun.h"
@@ -57,13 +56,11 @@ int czy_int(char *napis)
 
 void zachowanie_make(FILE *plik, int w, int h, double min_wag, double max_wag)
 {
-    printf("make %d  %d  %f  %f\n", w, h, min_wag, max_wag);
     struct graf *g = stworz_graf(w, h, min_wag, max_wag, 0);
     g->w = w;
     g->h = h;
     zapisz_graf(plik, g);
     free_graf(g);
-    free(g);
 }
 
 void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
@@ -72,24 +69,17 @@ void zachowanie_path(FILE *plik, int from_x, int from_y, int to_x, int to_y)
     if (g == NULL)
         return;
     int from = from_x + from_y * g->w, to = to_x + to_y * g->w;
+
     struct dijkstra_out *out = dijkstra(g, from);
-    if (out->droga[to] < __DBL_MAX__)
-        printf("Długość: %lf\nDroga: %d", out->droga[to], to);
-    else
-        printf("Nie nma połączenia między wierzchołkami\n");
+    printf("Długość: %lf\nDroga: %d", out->droga[to], to);
+
     for (int x = to; x != from; x = out->od[x])
-    // for (int x = 0; x < 100; x++)
-    {
         printf("<-%d", out->od[x]);
-        //     printf("(%d,%d)", x, out->od[x]);
-    }
     printf("\n");
 
     free_graf(g);
-    free(g);
     free(out->droga);
     free(out->od);
-    free(out->odwiedzone);
     free(out);
 }
 
@@ -100,17 +90,302 @@ void zachowanie_check(FILE *plik)
         return;
     struct bfs_out *out;
     out = bfs(g, 0);
+
     for (int x = 0; x < g->cells; x++)
         if (out->zwiedzone[x] != 2)
         {
-            printf("Graf niespojny");
+            printf("Graf niespojny\n");
             free_graf(g);
-            free(g);
             return;
         }
-    printf("Graf spojny");
+    printf("Graf spojny\n");
     free_graf(g);
-    free(g);
+    free_bfs_out(out);
+}
+
+void parse_argumenty_make(int argc, char *argv[], int od, double *min_wag, double *max_wag)
+{
+    if (argc == od + 3 && czy_double(argv[od + 1]) && czy_double(argv[od + 2]))
+    {
+        *min_wag = atof(argv[5]);
+        *max_wag = atof(argv[6]);
+        if (min_wag > max_wag)
+        {
+            double pom = *min_wag;
+            *min_wag = *max_wag;
+            *max_wag = pom;
+        }
+    }
+    else if (argc == od + 5 && strcmp(argv[od + 1], "--weight_min") == 0 && strcmp(argv[od + 3], "--weight_max") == 0 && czy_double(argv[od + 2]) && czy_double(argv[od + 4]))
+    {
+        *min_wag = atof(argv[6]);
+        *max_wag = atof(argv[8]);
+    }
+}
+
+int parse_make(int argc, char *argv[])
+{
+    int w, h;
+
+    if (argc < 5)
+    {
+        fprintf(stderr, "Niepoprawna ilosc argumnetow\n");
+        instrukcja();
+        return 1;
+    }
+    FILE *out = NULL;
+    out = fopen(argv[2], "w");
+    if (!out)
+    {
+        fprintf(stderr, "Nie udało się utworzyć pliku wyjściowego\n");
+        return 1;
+    }
+    double min_wag = 0, max_wag = 1;
+    // polecenie postaci graph make plik [arg]... val val
+    if (czy_int(argv[3]))
+    {
+        if (czy_int(argv[4]))
+        {
+            w = atoi(argv[3]);
+            h = atoi(argv[4]);
+            parse_argumenty_make(argc, argv, 4, &min_wag, &max_wag);
+        }
+        else
+        {
+            fprintf(stderr, "Nie podano parametru height\n");
+
+            fclose(out);
+            instrukcja();
+            return 1;
+        }
+    }
+    else if (czy_int(argv[4]) && czy_int(argv[6]))
+    {
+        // polecenie postaci graph make plik [arg]... {w | width} val {h | height} val
+        if (strcmp(argv[3], "width") == 0 || strcmp(argv[3], "w") == 0)
+        {
+            if ((strcmp(argv[5], "height") == 0 || strcmp(argv[5], "h") == 0))
+            {
+                w = atoi(argv[4]);
+                h = atoi(argv[6]);
+                parse_argumenty_make(argc, argv, 6, &min_wag, &max_wag);
+            }
+            else
+            {
+                printf("Bledne argumenty wywołania, instrukcja\n");
+                fclose(out);
+                instrukcja();
+                return 1;
+            }
+        }
+        // polecenie postaci graph make plik [arg]... {h | height} val {w | width} val
+        else if (strcmp(argv[5], "width") == 0 || strcmp(argv[5], "w") == 0)
+        {
+            if ((strcmp(argv[3], "height") == 0 || strcmp(argv[3], "h") == 0))
+            {
+                w = atoi(argv[4]);
+                h = atoi(argv[6]);
+                parse_argumenty_make(argc, argv, 6, &min_wag, &max_wag);
+            }
+            else
+            {
+                printf("Bledne argumenty wywołania, instrukcja\n");
+                fclose(out);
+                instrukcja();
+                return 1;
+            }
+        }
+        else
+        {
+            printf("Bledne argumenty wywołania, instrukcja\n");
+            fclose(out);
+            instrukcja();
+            return 1;
+        }
+    }
+    else
+    {
+        printf("Bledne argumenty wywołania, instrukcja\n");
+        fclose(out);
+        instrukcja();
+        return 1;
+    }
+    zachowanie_make(out, w, h, min_wag, max_wag);
+    fclose(out);
+    return 0;
+}
+
+int parse_check(char *argv[])
+{
+    FILE *in = fopen(argv[2], "r");
+    if (!in)
+    {
+        fprintf(stderr, "nie udało się wczytać pliku wejściowego\n");
+        return 1;
+    }
+    zachowanie_check(in);
+    fclose(in);
+    return 0;
+}
+
+int parse_path(int argc, char *argv[])
+{
+    int from_x, from_y, to_x, to_y;
+    FILE *in = fopen(argv[2], "r");
+    if (!in)
+    {
+        fprintf(stderr, "nie udało się wczytać pliku wejściowego\n");
+        return 1;
+    }
+    if (argc == 7)
+    {
+        if (czy_int(argv[3]) && czy_int(argv[4]) && czy_int(argv[5]) && czy_int(argv[6]))
+        {
+            from_x = atoi(argv[3]);
+            from_y = atoi(argv[4]);
+            to_x = atoi(argv[5]);
+            to_y = atoi(argv[6]);
+        }
+        else
+        {
+            printf("Błędne argumenty wywołania\n");
+            fclose(in);
+            instrukcja();
+            return 1;
+        }
+    }
+    else if (argc == 11)
+    {
+        if (czy_int(argv[4]) && czy_int(argv[6]) && czy_int(argv[8]) && czy_int(argv[10]))
+        {
+            int byl_from_x = 0, byl_from_y = 0, byl_to_x = 0, byl_to_y = 0;
+            for (int x = 3; x < 11; x += 2)
+            {
+                if (strcmp(argv[x], "from_x") == 0)
+                {
+                    if (byl_from_x)
+                    {
+                        printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                        fclose(in);
+                        instrukcja();
+                        return 1;
+                    }
+                    byl_from_x = 1;
+                    from_x = atoi(argv[x + 1]);
+                }
+                else if (strcmp(argv[x], "from_y") == 0)
+                {
+
+                    if (byl_from_y)
+                    {
+                        printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                        fclose(in);
+                        instrukcja();
+                        return 1;
+                    }
+                    byl_from_y = 1;
+                    from_y = atoi(argv[x + 1]);
+                }
+                else if (strcmp(argv[x], "to_x") == 0)
+                {
+                    if (byl_to_x)
+                    {
+                        printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                        fclose(in);
+                        instrukcja();
+                        return 1;
+                    }
+                    byl_to_x = 1;
+                    to_x = atoi(argv[x + 1]);
+                }
+                else if (strcmp(argv[x], "to_y") == 0)
+                {
+                    if (byl_to_y)
+                    {
+                        printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                        fclose(in);
+                        instrukcja();
+                        return 1;
+                    }
+                    byl_to_y = 1;
+                    to_y = atoi(argv[x + 1]);
+                }
+                else
+                {
+                    printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
+                    fclose(in);
+                    instrukcja();
+                    return 1;
+                }
+            }
+        }
+        else
+        {
+            printf("błąd, po from_x, from_y, to_x, to_y oczekiwana jest watość parametru typu double\n");
+            fclose(in);
+            instrukcja();
+            return 1;
+        }
+    }
+    else
+    {
+        printf("Błędne argumenty\n");
+        fclose(in);
+        instrukcja();
+        return 1;
+    }
+    zachowanie_path(in, from_x, from_y, to_x, to_y);
+    fclose(in);
+    return 0;
+}
+
+int parse_test(int argc, char *argv[])
+{
+    for (int x = 2; x < argc; x++)
+    {
+        if (strcmp(argv[x], "--kopiec") == 0)
+        {
+            if (x + 3 >= argc)
+            {
+                printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
+                instrukcja();
+                return 1;
+            }
+            if (czy_int(argv[x + 1]) && czy_double(argv[x + 2]) && czy_double(argv[x + 2]))
+                printf("%s\n", test1_kopiec(atoi(argv[x + 1]), atof(argv[x + 2]), atof(argv[x + 3])) == 0 ? ANSI_KOLOR_ZIELONY "OK" ANSI_KOLOR_RESET : ANSI_KOLOR_CZERWONY "BŁĄD" ANSI_KOLOR_RESET);
+            else
+            {
+                printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
+                instrukcja();
+                return 1;
+            }
+            x += 3;
+        }
+        else if (strcmp(argv[x], "--kolejka") == 0)
+        {
+            if (x + 1 >= argc)
+            {
+                printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
+                instrukcja();
+                return 1;
+            }
+            if (czy_int(argv[x + 1]))
+                printf("%s\n", test1_kolejka(atoi(argv[x + 1])) == 0 ? ANSI_KOLOR_ZIELONY "OK" ANSI_KOLOR_RESET : ANSI_KOLOR_CZERWONY "BŁĄD" ANSI_KOLOR_RESET);
+            else
+            {
+                printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
+                instrukcja();
+                return 1;
+            }
+            x++;
+        }
+        else
+        {
+            instrukcja();
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int arg_parse(int argc, char *argv[])
@@ -121,325 +396,17 @@ int arg_parse(int argc, char *argv[])
         instrukcja();
         return 1;
     }
-    FILE *out_or_in = NULL;
 
     if (strcmp(argv[1], "make") == 0)
-    {
-        int w, h;
-        out_or_in = fopen(argv[2], "w");
-        if (argc < 5)
-        {
-            fprintf(stderr, "Niepoprawna ilosc argumnetow\n");
-            if (out_or_in)
-                fclose(out_or_in);
-            instrukcja();
-            return 1;
-        }
+        return parse_make(argc, argv);
+    if (strcmp(argv[1], "check") == 0)
+        return parse_check(argv);
+    if (strcmp(argv[1], "path") == 0)
+        return parse_path(argc, argv);
+    if (strcmp(argv[1], "test") == 0)
+        return parse_test(argc, argv);
 
-        int poz_par = 0; // poz_par - o ile miejsc przesuniete sa parametry od polecenia
-        double min_wag = 0, max_wag = 1;
-        if (argc < 5)
-        {
-            printf("za mało argumentów wywołania\n");
-            if (out_or_in)
-                fclose(out_or_in);
-            instrukcja();
-            return 1;
-        }
-        // Szukam argumentów
-        for (int x = 3; x < argc - 1; x++)
-        {
-            if (strcmp(argv[x], "--weight_min") == 0)
-            {
-                if (czy_double(argv[x + 1]))
-                {
-                    poz_par += 2;
-                    min_wag = atof(argv[x + 1]);
-                    x++;
-                }
-                else
-                {
-                    printf("Po argumencie --weight_min spodziewana jest wartość\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-            }
-            else if (strcmp(argv[x], "--weight_max") == 0)
-            {
-                if (czy_double(argv[x + 1]))
-                {
-                    poz_par += 2;
-                    max_wag = atof(argv[x + 1]);
-                    x++;
-                }
-                else
-                {
-                    printf("Po argumencie --weight_max spodziewana jest wartość\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-            }
-            else
-                break;
-        }
-        // polecenie postaci graph make plik [arg]... val val
-        if (czy_int(argv[3 + poz_par]))
-        {
-            if (czy_int(argv[4 + poz_par]))
-            {
-                w = atoi(argv[3 + poz_par]);
-                h = atoi(argv[4 + poz_par]);
-            }
-            else
-            {
-                fprintf(stderr, "Nie podano parametru height\n");
-                if (out_or_in)
-                    fclose(out_or_in);
-                instrukcja();
-                return 1;
-            }
-        }
-        else if (czy_int(argv[4 + poz_par]) && czy_int(argv[6 + poz_par]))
-        {
-            // polecenie postaci graph make plik [arg]... {w | width} val {h | height} val
-            if (strcmp(argv[3 + poz_par], "width") == 0 || strcmp(argv[3 + poz_par], "w") == 0)
-            {
-                if ((strcmp(argv[5 + poz_par], "height") == 0 || strcmp(argv[5 + poz_par], "h") == 0))
-                {
-                    w = atoi(argv[4 + poz_par]);
-                    h = atoi(argv[6 + poz_par]);
-                }
-                else
-                {
-                    printf("Bledne argumenty wywołania, instrukcja\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-            }
-            // polecenie postaci graph make plik [arg]... {h | height} val {w | width} val
-            else if (strcmp(argv[5 + poz_par], "width") == 0 || strcmp(argv[5 + poz_par], "w") == 0)
-            {
-                if ((strcmp(argv[3 + poz_par], "height") == 0 || strcmp(argv[3 + poz_par], "h") == 0))
-                {
-                    w = atoi(argv[4 + poz_par]);
-                    h = atoi(argv[6 + poz_par]);
-                }
-                else
-                {
-                    printf("Bledne argumenty wywołania, instrukcja\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-            }
-            else
-            {
-                printf("Bledne argumenty wywołania, instrukcja\n");
-                if (out_or_in)
-                    fclose(out_or_in);
-                instrukcja();
-                return 1;
-            }
-        }
-        else
-        {
-            printf("Bledne argumenty wywołania, instrukcja\n");
-            if (out_or_in)
-                fclose(out_or_in);
-            instrukcja();
-            return 1;
-        }
-        zachowanie_make(out_or_in, w, h, min_wag, max_wag);
-    }
-    else if (strcmp(argv[1], "check") == 0)
-    {
-        out_or_in = fopen(argv[2], "r");
-        srand(time(NULL));
-        zachowanie_check(out_or_in);
-        // struct graf *g = stworz_graf(val1, val2); // jeszcze nie ma zaimplementowanej funkcji wczytaj
-    }
-    else if (strcmp(argv[1], "path") == 0)
-    {
-        int from_x, from_y, to_x, to_y;
-        out_or_in = fopen(argv[2], "r");
-        if (argc == 7)
-        {
-            if (czy_int(argv[3]) && czy_int(argv[4]) && czy_int(argv[5]) && czy_int(argv[6]))
-            {
-                from_x = atoi(argv[3]);
-                from_y = atoi(argv[4]);
-                to_x = atoi(argv[5]);
-                to_y = atoi(argv[6]);
-            }
-            else
-            {
-                printf("Błędne argumenty wywołania\n");
-                if (out_or_in)
-                    fclose(out_or_in);
-                instrukcja();
-                return 1;
-            }
-        }
-        else if (argc == 11)
-        {
-            if (czy_int(argv[4]) && czy_int(argv[6]) && czy_int(argv[8]) && czy_int(argv[10]))
-            {
-                int byl_from_x = 0, byl_from_y = 0, byl_to_x = 0, byl_to_y = 0;
-                for (int x = 3; x < 11; x += 2)
-                {
-                    if (strcmp(argv[x], "from_x") == 0)
-                    {
-                        if (byl_from_x)
-                        {
-                            printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
-                            if (out_or_in)
-                                fclose(out_or_in);
-                            instrukcja();
-                            return 1;
-                        }
-                        byl_from_x = 1;
-                        from_x = atoi(argv[x + 1]);
-                    }
-                    else if (strcmp(argv[x], "from_y") == 0)
-                    {
-
-                        if (byl_from_y)
-                        {
-                            printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
-                            if (out_or_in)
-                                fclose(out_or_in);
-                            instrukcja();
-                            return 1;
-                        }
-                        byl_from_y = 1;
-                        from_y = atoi(argv[x + 1]);
-                    }
-                    else if (strcmp(argv[x], "to_x") == 0)
-                    {
-                        if (byl_to_x)
-                        {
-                            printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
-                            if (out_or_in)
-                                fclose(out_or_in);
-                            instrukcja();
-                            return 1;
-                        }
-                        byl_to_x = 1;
-                        to_x = atoi(argv[x + 1]);
-                    }
-                    else if (strcmp(argv[x], "to_y") == 0)
-                    {
-                        if (byl_to_y)
-                        {
-                            printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
-                            if (out_or_in)
-                                fclose(out_or_in);
-                            instrukcja();
-                            return 1;
-                        }
-                        byl_to_y = 1;
-                        to_y = atoi(argv[x + 1]);
-                    }
-                    else
-                    {
-                        printf("błąd, wymagane argumenty from_x, from_y, to_x, to_y, bez powtórzeń\n");
-                        if (out_or_in)
-                            fclose(out_or_in);
-                        instrukcja();
-                        return 1;
-                    }
-                }
-            }
-            else
-            {
-                printf("błąd, po from_x, from_y, to_x, to_y oczekiwana jest watość parametru typu double\n");
-                if (out_or_in)
-                    fclose(out_or_in);
-                instrukcja();
-                return 1;
-            }
-        }
-        else
-        {
-            printf("Błędne argumenty\n");
-            if (out_or_in)
-                fclose(out_or_in);
-            instrukcja();
-            return 1;
-        }
-        zachowanie_path(out_or_in, from_x, from_y, to_x, to_y);
-    }
-    else if (strcmp(argv[1], "test") == 0)
-    {
-        for (int x = 2; x < argc; x++)
-        {
-            if (strcmp(argv[x], "--kopiec") == 0)
-            {
-                if (x + 3 >= argc)
-                {
-                    printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-                if (czy_int(argv[x + 1]) && czy_double(argv[x + 2]) && czy_double(argv[x + 2]))
-                    printf("%s\n", test1_kopiec(atoi(argv[x + 1]), atof(argv[x + 2]), atof(argv[x + 3])) == 0 ? ANSI_KOLOR_ZIELONY "OK" ANSI_KOLOR_RESET : ANSI_KOLOR_CZERWONY "BŁĄD" ANSI_KOLOR_RESET);
-                else
-                {
-                    printf("Błąd przy teście kopca wymagane są argumenty int ile, double od, double _od\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-                x += 3;
-            }
-            else if (strcmp(argv[x], "--kolejka") == 0)
-            {
-                if (x + 1 >= argc)
-                {
-                    printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-                if (czy_int(argv[x + 1]))
-                    printf("%s\n", test1_kolejka(atoi(argv[x + 1])) == 0 ? ANSI_KOLOR_ZIELONY "OK" ANSI_KOLOR_RESET : ANSI_KOLOR_CZERWONY "BŁĄD" ANSI_KOLOR_RESET);
-                else
-                {
-                    printf("Błąd przy teście kolejki wymagane są argumenty int ile\n");
-                    if (out_or_in)
-                        fclose(out_or_in);
-                    instrukcja();
-                    return 1;
-                }
-                x++;
-            }
-            else
-            {
-                if (out_or_in)
-                    fclose(out_or_in);
-                instrukcja();
-                return 1;
-            }
-        }
-    }
-    else
-    {
-        fprintf(stderr, "Błąd, brak zprecyzowanego dzialania programu\n");
-        if (out_or_in)
-            fclose(out_or_in);
-        instrukcja();
-        return 1;
-    }
-    return 0;
+    fprintf(stderr, "Błąd, brak zprecyzowanego dzialania programu\n");
+    instrukcja();
+    return 1;
 }

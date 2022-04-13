@@ -17,7 +17,6 @@ void zapisz_graf(FILE *out, struct graf *g)
         }
         fprintf(out, "\n");
     }
-    fclose(out);
 }
 
 struct graf *wczytaj_graf(FILE *in)
@@ -59,6 +58,11 @@ struct graf *wczytaj_graf(FILE *in)
         fscanf(in, "%d%c%c%lf", &krawedz_do, &tmp3, &tmp4, &waga);
         g->tab[krawedz_od] = dodaj_k(g->tab[krawedz_od], init_k(krawedz_do, waga));
     }
-    fclose(in);
+    if (krawedz_od <= w * h)
+    {
+        printf("Wczytano zły graf");
+        free_graf(g);
+        g = NULL;
+    }
     return g;
 }

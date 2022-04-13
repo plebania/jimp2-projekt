@@ -1,6 +1,7 @@
 #!/bin/sh
 #ARGUMENTY
 
+
 echo Test kopiec 1:
 ./bin/graph test --kopiec 10 2.0 5.0
 echo Test kopiec 2:
