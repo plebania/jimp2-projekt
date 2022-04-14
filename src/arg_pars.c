@@ -116,7 +116,7 @@ void parse_argumenty_make(int argc, char *argv[], int od, double *min_wag, doubl
             *max_wag = pom;
         }
     }
-    else if (argc == od + 5 && strcmp(argv[od + 1], "--weight_min") == 0 && strcmp(argv[od + 3], "--weight_max") == 0 && czy_double(argv[od + 2]) && czy_double(argv[od + 4]))
+    else if (argc == od + 5 && (strcmp(argv[od + 1], "--weight_min") == 0 || strcmp(argv[od + 1], "-w_min") == 0) && (strcmp(argv[od + 3], "--weight_max") == 0 || strcmp(argv[od + 3], "-w_max") == 0) && czy_double(argv[od + 2]) && czy_double(argv[od + 4]))
     {
         *min_wag = atof(argv[6]);
         *max_wag = atof(argv[8]);
