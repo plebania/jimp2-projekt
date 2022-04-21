@@ -4,9 +4,9 @@ Graph
 
 Streszczenie
 
-graph make file_out { {width | w} | val1} { {height | h} val2  | val2} {val 3 val4 | {--weight_min | -w_min} val3 {--weight_max | -w_max} val4}
+graph make file_out { {width | w} | val1} { {height | h} val2  | val2} {val 3 val4 | {--weight_min | -w_min} val3 {--weight_max | -w_max} val4}  [args...]
 graph check file_in
-graph path file_in from_x val from_y val to_x val to_y val
+graph path file_in {from val1 | val1} {to val2 | val2}
 
 
 Opis:
@@ -29,11 +29,22 @@ Parametry:
         wysokość generowanego grafu, liczba naturalna
 
 Argumenty:
-
-    val3, -w_min val3, --weight_min val3
+    
+    Argumenty można przekazać w 2 formatach
+    
+    Forma pierwsza:
+    val3 val4 {val5}
+        gdzie val3 to minimalna wratość(double) losowanych wag,
+        val4 to maksymalna wartość(double) losowanych wag,
+        opcjonalnie val5 to wartość(int) parametru psuć, który jeśli będzie większy niż 1 to z grafu będą usuwane losowe krawędzie podczas tworzenia
+    
+    Forma dróga:
+    {-w_min val3 | --weight_min val3}
         minimalna wartość losowanych wag grafu, liczba rzeczywista, jeśli nie podano domyślną wartością jest 0
-    val4, -w_max val4, --weight_max val4
+    {-w_max val4 | --weight_max val4}
         maksymalna wartość losowanych wag grafu, liczba rzeczywista, jeśli nie podano domyślną wartością jest 1
+    {-p | --psuc}
+        wartość(int) parametru psuć, który jeśli będzie większy niż 1 to z grafu będą usuwane losowe krawędzie podczas tworzenia
 
 graph check file_in
     polecenie zwraca logiczną wartość 1 jeśli graf w pliku wejściowym file_in jest koherentny i 0 jeśli nie jest
@@ -43,20 +54,19 @@ Parametry:
     file_in
         Ścieżka z której graf zostanie wczytany
 
-graph path file_in {from_x val1 from_y val2 to_x val3 to_y val4 | val1 val2 val3 val4}
-    polecenie wypisujące najkrtótszą ścieżkę między podanymi w parametrach wierzchołkami grafu
+graph path file_in {from val1 to val2 | val1 val2}
+    polecenie wypisujące najkrtótszą ścieżkę między podanymi wierzchołkami grafu
 
 Parametry:
     
     file_in
         Ścieżka z której graf zostanie wczytany
 
-    {from_x val1 | val1}, {from_y val2 | val2}
-        odpowiednio horyzontalna i wertykalna współrzędna pozycji wierzchołka grafu od którego szukana będzie najkrótsza ścieżka, liczby naturalne, współrzędne liczone od 0
+    {from val1 | val1}
+        Nr wierzchołka od którego szukana będzie ścieżka
 
-    {to_x val3 | val3}, {to_y val4 | val4}
-        odpowiednio horyzontalna i wertykalna współrzędna pozycji wierzchołka grafu do którego szukana będzie najkrótsza ścieżka, liczby naturalne, współrzędne liczone od 0
-        
+    {to val2 | val2}
+        Nr wierzchołka do którego szukana będzie ścieżka
 
 Komunikaty błędów:
 
